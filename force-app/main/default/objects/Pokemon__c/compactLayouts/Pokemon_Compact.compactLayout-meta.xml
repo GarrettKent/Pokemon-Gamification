@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Pokemon_Compact</fullName>
+    <fields>Sprite__c</fields>
+    <fields>Nickname__c</fields>
+    <fields>Level__c</fields>
+    <fields>Type__c</fields>
+    <fields>Type_2__c</fields>
+    <fields>Is_Shiny__c</fields>
+    <label>Pokemon Compact</label>
+</CompactLayout>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Pokedex_Must_Be_Valid</fullName>
+    <active>true</active>
+    <description>Matches the Gen 1-4 species seed (493 entries). Raise the upper bound when new generations are added to pokemonSpeciesSeed.json.</description>
+    <errorConditionFormula>(ISNEW() || ISCHANGED(Pokedex_Number__c)) &amp;&amp; (ISBLANK(Pokedex_Number__c) || Pokedex_Number__c &lt; 1 || Pokedex_Number__c &gt; 493)</errorConditionFormula>
+    <errorDisplayField>Pokedex_Number__c</errorDisplayField>
+    <errorMessage>Pokedex number must be between 1 and 493 (Gen 1-4).</errorMessage>
+</ValidationRule>

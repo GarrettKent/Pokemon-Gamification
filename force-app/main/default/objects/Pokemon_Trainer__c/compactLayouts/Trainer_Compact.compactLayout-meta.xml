@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Trainer_Compact</fullName>
+    <fields>Name</fields>
+    <fields>Currency__c</fields>
+    <fields>Experience_Tokens__c</fields>
+    <fields>Poke_Balls__c</fields>
+    <fields>Great_Balls__c</fields>
+    <fields>Ultra_Balls__c</fields>
+    <fields>Master_Balls__c</fields>
+    <label>Trainer Compact</label>
+</CompactLayout>

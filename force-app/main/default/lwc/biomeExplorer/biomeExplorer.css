@@ -1,0 +1,119 @@
+/* Title: biomeExplorer
+ * Created By: Garrett Kent - 06/20/2026
+ * Purpose: Visual styling for the biome explorer — elevated borderless panel, animated tall-grass patch tiles, and the Poke Ball motif. Framing comes from shadow + radius + spacing, never hairline borders.
+ */
+
+.explorer-panel {
+    display: block;
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.06);
+    padding: 1rem 1.25rem 1.25rem;
+}
+
+.explorer-title {
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+/* Poke Ball icon mark — the one sparing use of Poke Ball red. */
+.poke-ball-mark {
+    display: inline-block;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 50% 50%, #ffffff 0 0.22rem, #2b2b2b 0.22rem 0.32rem, transparent 0.32rem),
+        linear-gradient(#ee1515 0 49%, #2b2b2b 49% 53%, #ffffff 53% 100%);
+}
+
+.grass-patch {
+    display: block;
+    width: 100%;
+    cursor: pointer;
+}
+
+.grass-patch[disabled] {
+    cursor: default;
+}
+
+/* Borderless rounded tiles — framing is radius + shadow, not a hairline border. */
+.patch-tile {
+    border-radius: 0.5rem;
+    padding: 1rem 0.5rem;
+    min-height: 4.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.patch-tile_grass {
+    background-color: #7ac74c;
+    transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+}
+
+.grass-patch:hover .patch-tile_grass {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(78, 130, 52, 0.4);
+}
+
+/* Shiny patch tell — borderless gold glow plus a gentle sparkle. Shown only on un-searched shiny tiles. */
+.patch-tile_shiny {
+    box-shadow: 0 0 0.5rem rgba(255, 215, 0, 0.85), 0 0 1.25rem rgba(255, 215, 0, 0.55);
+    animation: shiny-sparkle 1.8s ease-in-out infinite;
+}
+
+.grass-patch:hover .patch-tile_shiny {
+    box-shadow: 0 0 0.75rem rgba(255, 215, 0, 0.95), 0 0 1.75rem rgba(255, 215, 0, 0.65);
+}
+
+@keyframes shiny-sparkle {
+    0%, 100% {
+        box-shadow: 0 0 0.5rem rgba(255, 215, 0, 0.7), 0 0 1.25rem rgba(255, 215, 0, 0.45);
+    }
+    50% {
+        box-shadow: 0 0 0.85rem rgba(255, 215, 0, 0.95), 0 0 1.9rem rgba(255, 215, 0, 0.7);
+    }
+}
+
+.patch-tile_searched {
+    background-color: #f3f3f3;
+    opacity: 0.6;
+    color: #706e6b;
+}
+
+/* Ball pouch — colored fills (poke/great/ultra/master), monospace counts. */
+.ball-pouch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: monospace;
+    font-size: 0.8125rem;
+    color: #3e3e3c;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background-color: #f4f6f9;
+}
+
+.ball-tally {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15rem;
+}
+
+.ball-sprite {
+    width: 1.1rem;
+    height: 1.1rem;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+/* Empty state — soft fill, no boxed border. */
+.empty-state {
+    background-color: #f4f6f9;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    color: #706e6b;
+}

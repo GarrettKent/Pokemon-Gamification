@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Total_EXP_Points__c</fullName>
+    <label>Total EXP Points</label>
+    <summarizedField>Pokemon__c.EXP_Points__c</summarizedField>
+    <summaryForeignKey>Pokemon__c.Pokemon_Trainer__c</summaryForeignKey>
+    <summaryOperation>sum</summaryOperation>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Summary</type>
+</CustomField>

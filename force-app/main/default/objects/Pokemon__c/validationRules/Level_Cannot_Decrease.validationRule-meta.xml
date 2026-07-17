@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Level_Cannot_Decrease</fullName>
+    <active>true</active>
+    <errorConditionFormula>ISCHANGED(Level__c) &amp;&amp; Level__c &lt; PRIORVALUE(Level__c)</errorConditionFormula>
+    <errorDisplayField>Level__c</errorDisplayField>
+    <errorMessage>A Pokemon's level cannot decrease once it has leveled up.</errorMessage>
+</ValidationRule>

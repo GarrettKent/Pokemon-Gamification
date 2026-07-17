@@ -1,0 +1,299 @@
+<template>
+    <div class="slds-is-relative">
+        <template lwc:if={loading}>
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </template>
+
+        <template lwc:if={clientObj.showOnboarding}>
+            <c-professor-oak-onboarding
+                starter-ids={starterIds}
+                ontrainercreated={handleTrainerCreated}
+                onclose={handleOnboardingClosed}
+            ></c-professor-oak-onboarding>
+        </template>
+
+        <template lwc:else>
+            <template lwc:if={clientObj.trainer}>
+                <!-- Trainer ID Card — borderless, elevated -->
+                <article class="trainer-card">
+                    <div class="trainer-card__top">
+                        <span class="trainer-card__avatar" title="Trainer">
+                            <span class="trainer-card__avatar-ball"></span>
+                            <lightning-icon
+                                icon-name="utility:user"
+                                size="small"
+                                variant="inverse"
+                            ></lightning-icon>
+                        </span>
+                        <div class="trainer-card__identity">
+                            <p class="trainer-card__eyebrow">Trainer Card</p>
+                            <h1 class="trainer-card__name">{clientObj.trainer.Name}</h1>
+                            <template lwc:if={clientObj.hasRival}>
+                                <p class="trainer-card__rival">{clientObj.rivalLabel}</p>
+                            </template>
+                        </div>
+                        <a
+                            class="trainer-card__jazz"
+                            href="https://www.youtube.com/watch?v=bCTgSHs-Go8"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Play Pokémon Jazz on YouTube"
+                        >
+                            <lightning-icon
+                                icon-name="utility:play"
+                                size="x-small"
+                                variant="inverse"
+                            ></lightning-icon>
+                            <span class="trainer-card__jazz-label">Play Pokémon Jazz</span>
+                        </a>
+                    </div>
+
+                    <!-- Currency / XP -->
+                    <div class="trainer-card__stats">
+                        <template for:each={clientObj.headerBadges} for:item="item">
+                            <div key={item.key} class="trainer-card__stat">
+                                <lightning-icon
+                                    icon-name={item.iconName}
+                                    size="x-small"
+                                    class="trainer-card__stat-icon"
+                                ></lightning-icon>
+                                <span class="trainer-card__stat-label">{item.label}</span>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Poke Ball inventory -->
+                    <div class="trainer-card__balls">
+                        <template for:each={clientObj.ballSummary} for:item="item">
+                            <div key={item.key} class="trainer-card__ball">
+                                <img src={item.icon} alt={item.label} class="trainer-card__ball-sprite" />
+                                <span class="trainer-card__ball-label">{item.label}</span>
+                            </div>
+                        </template>
+                    </div>
+                </article>
+
+                <!-- Roster -->
+                <div class="roster-heading">
+                    <span class="trainer-card__ball-dot"></span>
+                    <h2 class="roster-heading__text">{clientObj.rosterHeading}</h2>
+                </div>
+
+                <template lwc:if={clientObj.hasParty}>
+                    <!-- Roster toolbar: search, filter toggle, sort -->
+                    <div class="roster-toolbar">
+                        <div class="roster-toolbar__search">
+                            <lightning-input
+                                type="search"
+                                variant="label-hidden"
+                                label="Search roster"
+                                placeholder="Search by name, nickname, or Pokedex #"
+                                value={searchTerm}
+                                onchange={handleSearchChange}
+                            ></lightning-input>
+                        </div>
+                        <div class="roster-toolbar__sort">
+                            <lightning-combobox
+                                variant="label-hidden"
+                                label="Sort by"
+                                value={sortField}
+                                options={clientObj.sortOptions}
+                                onchange={handleSortFieldChange}
+                            ></lightning-combobox>
+                            <lightning-combobox
+                                variant="label-hidden"
+                                label="Sort direction"
+                                value={sortDirection}
+                                options={clientObj.sortDirectionOptions}
+                                onchange={handleSortDirectionChange}
+                            ></lightning-combobox>
+                        </div>
+                        <lightning-button-stateful
+                            variant="neutral"
+                            icon-name-when-off="utility:filterList"
+                            icon-name-when-on="utility:filterList"
+                            label-when-off="Filters"
+                            label-when-on="Filters"
+                            selected={clientObj.showFilters}
+                            onclick={handleToggleFilters}
+                            class="roster-toolbar__filter-toggle"
+                        ></lightning-button-stateful>
+                    </div>
+
+                    <!-- Filter panel -->
+                    <template lwc:if={clientObj.showFilters}>
+                        <div class="roster-filters">
+                            <div class="roster-filters__row">
+                                <lightning-dual-listbox
+                                    label="Types"
+                                    source-label="Available"
+                                    selected-label="Selected"
+                                    options={clientObj.typeOptions}
+                                    value={selectedTypes}
+                                    onchange={handleTypesChange}
+                                    class="roster-filters__types"
+                                ></lightning-dual-listbox>
+                                <div class="roster-filters__levels">
+                                    <lightning-input
+                                        type="number"
+                                        label="Min level"
+                                        value={minLevel}
+                                        min="1"
+                                        onchange={handleMinLevelChange}
+                                    ></lightning-input>
+                                    <lightning-input
+                                        type="number"
+                                        label="Max level"
+                                        value={maxLevel}
+                                        min="1"
+                                        onchange={handleMaxLevelChange}
+                                    ></lightning-input>
+                                    <lightning-input
+                                        type="toggle"
+                                        label="Shiny only"
+                                        message-toggle-active="On"
+                                        message-toggle-inactive="Off"
+                                        checked={shinyOnly}
+                                        onchange={handleShinyChange}
+                                    ></lightning-input>
+                                </div>
+                            </div>
+                            <div class="roster-filters__actions">
+                                <lightning-button
+                                    variant="base"
+                                    label="Clear filters"
+                                    onclick={handleClearFilters}
+                                ></lightning-button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <template lwc:if={clientObj.hasResults}>
+                        <div class="roster-grid">
+                            <template for:each={clientObj.pageItems} for:item="poke">
+                                <div key={poke.Id} class="roster-tile">
+                                    <c-pokemon-card
+                                        pokemon={poke}
+                                        available-tokens={clientObj.availableTokens}
+                                        available-stones={clientObj.availableStones}
+                                        onpokemonreleased={handleReleased}
+                                        onpokemonupdated={handleUpdated}
+                                        onbalancechanged={handleBalanceChanged}
+                                    ></c-pokemon-card>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="roster-pager">
+                            <span class="roster-pager__count">{clientObj.pageInfo}</span>
+                            <div class="roster-pager__nav">
+                                <lightning-button-icon
+                                    icon-name="utility:jump_to_left"
+                                    alternative-text="First page"
+                                    title="First page"
+                                    variant="bare"
+                                    disabled={clientObj.isFirstPage}
+                                    onclick={handleFirstPage}
+                                    class="roster-pager__step"
+                                ></lightning-button-icon>
+                                <lightning-button-icon
+                                    icon-name="utility:chevronleft"
+                                    alternative-text="Previous page"
+                                    title="Previous page"
+                                    variant="bare"
+                                    disabled={clientObj.isFirstPage}
+                                    onclick={handlePreviousPage}
+                                    class="roster-pager__step"
+                                ></lightning-button-icon>
+                                <span class="roster-pager__page">{clientObj.pageLabel}</span>
+                                <lightning-button-icon
+                                    icon-name="utility:chevronright"
+                                    alternative-text="Next page"
+                                    title="Next page"
+                                    variant="bare"
+                                    disabled={clientObj.isLastPage}
+                                    onclick={handleNextPage}
+                                    class="roster-pager__step"
+                                ></lightning-button-icon>
+                                <lightning-button-icon
+                                    icon-name="utility:jump_to_right"
+                                    alternative-text="Last page"
+                                    title="Last page"
+                                    variant="bare"
+                                    disabled={clientObj.isLastPage}
+                                    onclick={handleLastPage}
+                                    class="roster-pager__step"
+                                ></lightning-button-icon>
+                            </div>
+                        </div>
+
+                        <!-- Page size -->
+                        <div class="roster-footer">
+                            <span class="roster-footer__label">Per page</span>
+                            <lightning-combobox
+                                variant="label-hidden"
+                                label="Per page"
+                                dropdown-alignment="auto"
+                                value={clientObj.pageSizeValue}
+                                options={clientObj.pageSizeOptions}
+                                onchange={handlePageSizeChange}
+                                class="roster-footer__select"
+                            ></lightning-combobox>
+                        </div>
+                    </template>
+
+                    <template lwc:else>
+                        <div class="empty-panel empty-panel_subtle">
+                            <p class="empty-panel__title">No Pokemon match your filters</p>
+                            <p class="empty-panel__hint">
+                                Try widening your search or clearing the filters.
+                            </p>
+                            <lightning-button
+                                variant="base"
+                                label="Clear filters"
+                                onclick={handleClearFilters}
+                                class="empty-panel__cta"
+                            ></lightning-button>
+                        </div>
+                    </template>
+                </template>
+
+                <template lwc:else>
+                    <div class="empty-panel">
+                        <span class="empty-panel__ball">
+                            <lightning-icon
+                                icon-name="utility:catch"
+                                size="medium"
+                                variant="inverse"
+                            ></lightning-icon>
+                        </span>
+                        <p class="empty-panel__title">No Pokemon yet!</p>
+                        <p class="empty-panel__hint">
+                            Head to the Biomes tab to catch your first wild Pokemon.
+                        </p>
+                    </div>
+                </template>
+            </template>
+
+            <template lwc:else>
+                <div class="empty-panel">
+                    <span class="empty-panel__ball">
+                        <lightning-icon
+                            icon-name="utility:catch"
+                            size="medium"
+                            variant="inverse"
+                        ></lightning-icon>
+                    </span>
+                    <p class="empty-panel__title">Ready to begin?</p>
+                    <lightning-button
+                        variant="brand"
+                        label="Start Your Adventure"
+                        onclick={handleStartAdventure}
+                        class="empty-panel__cta"
+                    ></lightning-button>
+                </div>
+            </template>
+        </template>
+    </div>
+</template>

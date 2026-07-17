@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Consumed_Encounters__c</fullName>
+    <description>Server-side single-use ledger for encounter tokens: one "tokenHash|epochMillis" entry per consumed (caught or fled) encounter, pruned past the 60-minute token TTL. No field permissions on purpose — players never read or write it; only Apex does.</description>
+    <externalId>false</externalId>
+    <label>Consumed Encounters</label>
+    <length>32768</length>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>

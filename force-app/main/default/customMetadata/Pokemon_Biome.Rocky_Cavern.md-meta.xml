@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Rocky Cavern</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Grass_Patch_Count__c</field>
+        <value xsi:type="xsd:double">4</value>
+    </values>
+    <values>
+        <field>Background_Image_Url__c</field>
+        <value xsi:type="xsd:string"></value>
+    </values>
+    <values>
+        <field>Encounters_Json__c</field>
+        <value xsi:type="xsd:string">[{"dex":13,"tier":"common"},{"dex":23,"tier":"common"},{"dex":27,"tier":"common"},{"dex":41,"tier":"common"},{"dex":43,"tier":"common"},{"dex":50,"tier":"common"},{"dex":69,"tier":"common"},{"dex":74,"tier":"common"},{"dex":167,"tier":"common"},{"dex":194,"tier":"common"},{"dex":261,"tier":"common"},{"dex":290,"tier":"common"},{"dex":299,"tier":"common"},{"dex":322,"tier":"common"},{"dex":328,"tier":"common"},{"dex":343,"tier":"common"},{"dex":406,"tier":"common"},{"dex":436,"tier":"common"},{"dex":438,"tier":"common"},{"dex":29,"tier":"common"},{"dex":32,"tier":"common"},{"dex":220,"tier":"common"},{"dex":316,"tier":"common"},{"dex":318,"tier":"common"},{"dex":434,"tier":"common"},{"dex":297,"tier":"common"},{"dex":48,"tier":"common"},{"dex":56,"tier":"common"},{"dex":72,"tier":"common"},{"dex":81,"tier":"common"},{"dex":88,"tier":"common"},{"dex":92,"tier":"common"},{"dex":104,"tier":"common"},{"dex":109,"tier":"common"},{"dex":213,"tier":"common"},{"dex":339,"tier":"common"},{"dex":66,"tier":"common"},{"dex":296,"tier":"common"},{"dex":304,"tier":"common"},{"dex":307,"tier":"common"},{"dex":342,"tier":"common"},{"dex":315,"tier":"common"},{"dex":323,"tier":"common"},{"dex":449,"tier":"common"},{"dex":453,"tier":"common"},{"dex":262,"tier":"common"},{"dex":14,"tier":"common"},{"dex":30,"tier":"common"},{"dex":33,"tier":"common"},{"dex":44,"tier":"common"},{"dex":442,"tier":"uncommon"},{"dex":24,"tier":"uncommon"},{"dex":28,"tier":"uncommon"},{"dex":42,"tier":"uncommon"},{"dex":67,"tier":"uncommon"},{"dex":93,"tier":"uncommon"},{"dex":168,"tier":"uncommon"},{"dex":169,"tier":"uncommon"},{"dex":195,"tier":"uncommon"},{"dex":286,"tier":"uncommon"},{"dex":305,"tier":"uncommon"},{"dex":308,"tier":"uncommon"},{"dex":336,"tier":"uncommon"},{"dex":344,"tier":"uncommon"},{"dex":437,"tier":"uncommon"},{"dex":49,"tier":"uncommon"},{"dex":57,"tier":"uncommon"},{"dex":89,"tier":"uncommon"},{"dex":105,"tier":"uncommon"},{"dex":205,"tier":"uncommon"},{"dex":219,"tier":"uncommon"},{"dex":221,"tier":"uncommon"},{"dex":236,"tier":"uncommon"},{"dex":317,"tier":"uncommon"},{"dex":340,"tier":"uncommon"},{"dex":374,"tier":"rare"},{"dex":375,"tier":"rare"},{"dex":376,"tier":"rare"},{"dex":208,"tier":"rare"},{"dex":212,"tier":"rare"}]</value>
+    </values>
+</CustomMetadata>

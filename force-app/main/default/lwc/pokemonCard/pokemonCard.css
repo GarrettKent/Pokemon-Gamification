@@ -1,0 +1,272 @@
+/* Title: pokemonCard
+ * Created By: Garrett Kent - 06/20/2026
+ * Purpose: Visual styling for the Pokemon card — soft-elevation rounded panel (no boxed framing), Poke-Ball sprite stage, type-fill chips, gold shiny, and stat bars. Component-scoped only.
+ * Modified: Garrett Kent - 06/21/2026 - Added Use Stone buttons, evolution white-out/reveal animation, and congrats banner styling.
+ * Modified: Garrett Kent - 06/22/2026 - Use real stone sprite on Use Stone buttons (.poke-stone-img); uniform card height via flex-column fill with a bottom-pinned actions footer.
+ * Modified: Garrett Kent - 07/06/2026 - Compact cards: hid stat bars, small bottom padding; name/level on their own line with type chips below.
+ */
+
+/* Card frame: elevation + rounded panel instead of a hairline boundary box.
+   Fills its roster grid cell (height: 100%) and lays out as a flex column so every card matches height and footers line up. */
+.poke-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 6px 18px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Body fills the remaining card height as a flex column; the actions footer pins to the bottom. */
+.poke-card .slds-card__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin: 0;
+    padding-bottom: 0.5rem;
+}
+
+/* Sprite stage holds a fixed footprint so its row aligns across every card. */
+.poke-stage {
+    flex: none;
+}
+
+/* Header */
+.poke-dex {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #6b6b6b;
+    letter-spacing: 0.02em;
+}
+
+.poke-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #181818;
+}
+
+/* Level pill — quiet neutral chip, not a colored bar. */
+.poke-level {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #2b2b2b;
+    background: #ededed;
+    border-radius: 999px;
+    padding: 0.15rem 0.55rem;
+    white-space: nowrap;
+}
+
+/* Sprite stage: Poke-Ball motif (red top arc, white belt, center button) carried by background, no framing border. */
+.poke-stage {
+    position: relative;
+    width: 100%;
+    height: 9rem;
+    border-radius: 0.5rem;
+    background:
+        radial-gradient(circle at 50% 100%, #ffffff 0 0.85rem, transparent 0.85rem),
+        linear-gradient(180deg, #fdeaea 0 calc(50% - 0.18rem), #d9d9d9 calc(50% - 0.18rem) calc(50% + 0.18rem), #f6f6f6 calc(50% + 0.18rem) 100%);
+    overflow: hidden;
+}
+
+.poke-stage::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0.45rem;
+    width: 0.7rem;
+    height: 0.7rem;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 0 0 0.18rem #cfcfcf;
+}
+
+.poke-sprite {
+    position: relative;
+    z-index: 1;
+    width: 7.5rem;
+    height: 7.5rem;
+    object-fit: contain;
+    filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.18));
+}
+
+/* Chips: type-colored FILLS (inline style supplies background/color), rounded pill, no outline. */
+.poke-chip {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    text-transform: capitalize;
+}
+
+/* Shiny — gold fill + dark ink, with a slow light-gold highlight sweep (scoped to this chip only). */
+.poke-chip_shiny {
+    color: #3a2f00;
+    background: linear-gradient(105deg, #FFD700 0%, #FFD700 38%, #FFF1A8 50%, #FFD700 62%, #FFD700 100%);
+    background-size: 280% 100%;
+    background-position: 100% 0;
+    animation: poke-shiny-shimmer 2.6s ease-in-out infinite;
+}
+
+@keyframes poke-shiny-shimmer {
+    0% {
+        background-position: 100% 0;
+    }
+    100% {
+        background-position: 0 0;
+    }
+}
+
+/* Legendary — deep gold, distinct from the type chips. */
+.poke-chip_legendary {
+    background: #c8a014;
+    color: #ffffff;
+}
+
+/* Mythical — royal purple, not red. */
+.poke-chip_mythical {
+    background: #6F35FC;
+    color: #ffffff;
+}
+
+.poke-chip_traded {
+    background: #e8e8e8;
+    color: #4a4a4a;
+}
+
+/* Stat bars */
+.poke-stat-row {
+    margin-bottom: 0.25rem;
+}
+
+.poke-stat-label {
+    width: 2.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #5a5a5a;
+}
+
+.poke-stat-track {
+    flex: 1;
+    height: 0.5rem;
+    background: #ededed;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.poke-stat-fill {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: #4a90d9;
+    transition: width 0.3s ease;
+}
+
+.poke-stat-value {
+    width: 2.25rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #2b2b2b;
+}
+
+/* Use Stone buttons — borderless, elevated soft-fill pills with a real stone sprite. */
+.poke-stone-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #2b2b2b;
+    background: #f4f1fb;
+    border: none;
+    border-radius: 999px;
+    padding: 0.3rem 0.75rem;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 3px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.poke-stone-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+.poke-stone-img {
+    display: inline-block;
+    width: 1.15rem;
+    height: 1.15rem;
+    object-fit: contain;
+    flex: none;
+}
+
+/* Evolution white-out: a full-cover overlay fading in over the sprite stage, then back out on reveal. */
+.evo-whiteout,
+.evo-reveal {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: #ffffff;
+    pointer-events: none;
+}
+
+.evo-whiteout {
+    opacity: 0;
+    animation: poke-evo-whiteout 0.7s ease-in forwards;
+}
+
+.evo-reveal {
+    opacity: 1;
+    animation: poke-evo-reveal 0.7s ease-out forwards;
+}
+
+@keyframes poke-evo-whiteout {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes poke-evo-reveal {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* Congrats banner — borderless, elevated soft-gold fill. */
+.poke-evolve-banner {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #3a2f00;
+    background: linear-gradient(180deg, #fff6d6 0%, #ffe9a8 100%);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Give EXP button sits in a flex row beside the grow-to-fill input; keep it at its natural width so the label stays on one line instead of wrapping "Give" / "EXP". */
+.poke-give-exp {
+    flex-shrink: 0;
+}
+
+/* Actions row: pinned to the card bottom (margin-top: auto) so footers line up across the roster row.
+   A single quiet divider above (border carrying real meaning), not framing. */
+.poke-actions {
+    margin-top: auto;
+    padding-top: 0.5rem;
+    border-top: 1px solid #ededed;
+}
+
+/* Release — the one sparing Poke-Ball-red accent. */
+.poke-release {
+    --slds-c-button-text-color: #EE1515;
+}

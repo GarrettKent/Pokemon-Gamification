@@ -1,0 +1,178 @@
+<template>
+    <article class="poke-card slds-is-relative">
+        <div class="slds-card__body slds-card__body_inner slds-is-relative">
+            <template lwc:if={loading}>
+                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </template>
+
+            <!-- Header: dex + name + level -->
+            <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-m-bottom_xx-small">
+                <div class="slds-truncate">
+                    <span class="poke-dex">{clientObj.dexLabel}</span>
+                    <span class="poke-name slds-m-left_xx-small">{clientObj.displayName}</span>
+                </div>
+                <span class="poke-level">{clientObj.levelLabel}</span>
+            </div>
+
+            <!-- Type chips + rarity / shiny badges on their own line -->
+            <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-m-bottom_x-small">
+                <span class="poke-chip slds-m-right_xx-small" style={clientObj.typeStyle1}>{clientObj.type1Label}</span>
+                <template lwc:if={clientObj.hasType2}>
+                    <span class="poke-chip slds-m-right_xx-small" style={clientObj.typeStyle2}>{clientObj.type2Label}</span>
+                </template>
+                <template lwc:if={clientObj.isShiny}>
+                    <span class="poke-chip poke-chip_shiny slds-m-right_xx-small">
+                        <lightning-icon icon-name="utility:favorite" size="xx-small" class="slds-m-right_xxx-small"></lightning-icon>Shiny
+                    </span>
+                </template>
+                <template lwc:if={clientObj.isLegendary}>
+                    <span class="poke-chip poke-chip_legendary slds-m-right_xx-small">Legendary</span>
+                </template>
+                <template lwc:if={clientObj.isMythical}>
+                    <span class="poke-chip poke-chip_mythical slds-m-right_xx-small">Mythical</span>
+                </template>
+                <template lwc:if={clientObj.isTraded}>
+                    <span class="poke-chip poke-chip_traded slds-m-right_xx-small">Traded</span>
+                </template>
+            </div>
+
+            <!-- Sprite stage: Poke-Ball motif -->
+            <div class="poke-stage slds-align_absolute-center slds-m-bottom_x-small">
+                <img src={pokemon.Image__c} onerror={handleImageError} alt={clientObj.spriteAlt} class="poke-sprite" />
+                <template lwc:if={clientObj.isEvolving}>
+                    <div class={clientObj.evolvingClass} onanimationend={handleEvoAnimationEnd}></div>
+                </template>
+            </div>
+
+            <template lwc:if={clientObj.evolveMessage}>
+                <div class="poke-evolve-banner slds-m-bottom_x-small slds-text-align_center">{clientObj.evolveMessage}</div>
+            </template>
+
+            <!-- Stat rows — hidden for now to keep cards compact -->
+            <!--
+            <div class="poke-stats slds-m-bottom_small">
+                <template for:each={clientObj.statRows} for:item="stat">
+                    <div key={stat.key} class="slds-grid slds-grid_vertical-align-center poke-stat-row">
+                        <span class="poke-stat-label slds-truncate">{stat.label}</span>
+                        <div class="poke-stat-track slds-m-horizontal_x-small">
+                            <span class="poke-stat-fill" style={stat.barStyle}>
+                                <span class="slds-assistive-text">{stat.percent}%</span>
+                            </span>
+                        </div>
+                        <span class="poke-stat-value slds-text-align_right">{stat.value}</span>
+                    </div>
+                </template>
+            </div>
+            -->
+
+            <!-- Rename -->
+            <div class="slds-m-bottom_small">
+                <template lwc:if={clientObj.canRename}>
+                    <div class="slds-grid slds-grid_vertical-align-end">
+                        <lightning-input
+                            class="slds-col"
+                            type="text"
+                            label="Nickname"
+                            value={clientObj.nicknameDraft}
+                            onchange={handleNicknameChange}
+                            max-length="12">
+                        </lightning-input>
+                        <lightning-button
+                            class="slds-m-left_x-small"
+                            label="Save"
+                            onclick={handleRename}>
+                        </lightning-button>
+                    </div>
+                </template>
+                <template lwc:else>
+                    <lightning-input type="text" label="Nickname" value={clientObj.displayName} read-only></lightning-input>
+                </template>
+            </div>
+
+            <!-- Evolve -->
+            <template lwc:if={clientObj.canEvolveNow}>
+                <div class="slds-align_absolute-center slds-m-bottom_small">
+                    <lightning-button
+                        variant="brand"
+                        icon-name="utility:upload"
+                        label="Evolve"
+                        onclick={handleEvolve}>
+                    </lightning-button>
+                </div>
+            </template>
+
+            <!-- Use Stone -->
+            <template lwc:if={clientObj.hasUsableStone}>
+                <div class="poke-stones slds-grid slds-wrap slds-grid_align-center slds-m-bottom_small">
+                    <template for:each={clientObj.usableStones} for:item="stone">
+                        <button
+                            key={stone.stoneKey}
+                            type="button"
+                            class="poke-stone-btn slds-m-around_xxx-small"
+                            data-stone={stone.stoneKey}
+                            onclick={handleUseStone}>
+                            <img src={stone.iconUrl} alt={stone.label} class="poke-stone-img" />
+                            <span class="poke-stone-label">{stone.label}</span>
+                        </button>
+                    </template>
+                </div>
+            </template>
+
+            <!-- Give EXP -->
+            <div class="slds-m-bottom_small">
+                <div class="slds-grid slds-grid_vertical-align-end">
+                    <lightning-input
+                        class="slds-col"
+                        type="number"
+                        label="Give EXP"
+                        min="0"
+                        max={availableTokens}
+                        value={clientObj.tokenDraft}
+                        onchange={handleTokenChange}>
+                    </lightning-input>
+                    <lightning-button
+                        class="poke-give-exp slds-m-left_x-small"
+                        variant="brand"
+                        label="Give EXP"
+                        onclick={handlePowerUp}>
+                    </lightning-button>
+                </div>
+                <p class="slds-text-body_small slds-text-color_weak slds-m-top_xxx-small">{clientObj.spendHint}</p>
+            </div>
+
+            <!-- Trade (Phase 2) + Release -->
+            <div class="slds-grid slds-grid_align-spread poke-actions">
+                <lightning-button
+                    label="Trade"
+                    disabled
+                    title="Coming in Phase 2">
+                </lightning-button>
+                <lightning-button
+                    class="poke-release"
+                    variant="destructive-text"
+                    label="Release"
+                    onclick={handleOpenRelease}>
+                </lightning-button>
+            </div>
+        </div>
+    </article>
+
+    <!-- Release confirmation modal -->
+    <template lwc:if={clientObj.showReleaseModal}>
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open slds-modal_full">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <h2 class="slds-modal__title slds-hyphenate">Release {clientObj.displayName}?</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium">
+                    <p>This will permanently release {clientObj.displayName} from your roster. This cannot be undone.</p>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Cancel" onclick={handleCancelRelease}></lightning-button>
+                    <lightning-button class="slds-m-left_x-small" variant="destructive" label="Release" onclick={handleConfirmRelease}></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

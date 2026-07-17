@@ -1,0 +1,136 @@
+<template>
+    <article class="slds-card mart-card">
+        <div class="mart-header slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+            <header class="slds-media slds-media_center">
+                <div class="slds-media__figure">
+                    <span class="mart-pokeball-mark" title="Poke Mart">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="24" height="24" aria-hidden="true">
+                            <clipPath id="martMarkClip"><circle cx="50" cy="50" r="46"></circle></clipPath>
+                            <g clip-path="url(#martMarkClip)">
+                                <rect x="0" y="0" width="100" height="50" fill="#EE1515"></rect>
+                                <rect x="0" y="50" width="100" height="50" fill="#f5f5f5"></rect>
+                                <rect x="0" y="44" width="100" height="12" fill="#1a1a1a"></rect>
+                            </g>
+                            <circle cx="50" cy="50" r="46" fill="none" stroke="#1a1a1a" stroke-width="4"></circle>
+                            <circle cx="50" cy="50" r="15" fill="#ffffff" stroke="#1a1a1a" stroke-width="6"></circle>
+                            <circle cx="50" cy="50" r="6" fill="#ffffff" stroke="#1a1a1a" stroke-width="3"></circle>
+                        </svg>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span class="slds-text-heading_small mart-header__title">Poke Mart</span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+
+        <div class="slds-card__body slds-card__body_inner slds-p-around_medium slds-is-relative">
+            <template lwc:if={loading}>
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </template>
+
+            <template lwc:if={clientObj.hasTrainer}>
+                <div class="slds-grid slds-wrap slds-gutters">
+                    <!-- LEFT: everything purchasable -->
+                    <div class="slds-col slds-size_1-of-1 slds-large-size_2-of-3">
+                        <!-- Poke Balls shelf -->
+                        <p class="slds-text-body_small mart-section-label slds-m-bottom_x-small">Poke Balls</p>
+                        <ul class="mart-shelf">
+                            <template for:each={clientObj.catalogItems} for:item="item">
+                                <li key={item.key} class="mart-row slds-grid slds-grid_vertical-align-center">
+                                    <img class="mart-row__icon" src={item.sprite} alt={item.name} />
+                                    <span class="mart-row__name">{item.name}</span>
+                                    <span class="mart-row__price">&#8369;{item.price}</span>
+                                    <div class="mart-row__stepper">
+                                        <button type="button" class="mart-step" title="Remove one" data-item={item.key} data-delta="-1" onclick={adjustQuantity}>&#8722;</button>
+                                        <input type="number" class="mart-row__qty" min="0" step="1" value={item.quantity} aria-label={item.name} data-ball={item.key} oninput={handleQuantityChange} />
+                                        <button type="button" class="mart-step" title="Add one" data-item={item.key} data-delta="1" onclick={adjustQuantity}>+</button>
+                                    </div>
+                                    <span class="mart-row__subtotal">&#8369;{item.lineTotal}</span>
+                                </li>
+                            </template>
+                        </ul>
+
+                        <!-- Evolution Stones shelf -->
+                        <p class="slds-text-body_small mart-section-label slds-m-bottom_x-small slds-m-top_medium">Evolution Stones</p>
+                        <ul class="mart-shelf">
+                            <template for:each={clientObj.stoneItems} for:item="item">
+                                <li key={item.key} class="mart-row slds-grid slds-grid_vertical-align-center">
+                                    <img class="mart-row__icon" src={item.iconUrl} alt={item.name} />
+                                    <span class="mart-row__name">{item.name}</span>
+                                    <span class="mart-row__price">&#8369;{item.price}</span>
+                                    <div class="mart-row__stepper">
+                                        <button type="button" class="mart-step" title="Remove one" data-item={item.key} data-delta="-1" onclick={adjustQuantity}>&#8722;</button>
+                                        <input type="number" class="mart-row__qty" min="0" step="1" value={item.quantity} aria-label={item.name} data-ball={item.key} oninput={handleQuantityChange} />
+                                        <button type="button" class="mart-step" title="Add one" data-item={item.key} data-delta="1" onclick={adjustQuantity}>+</button>
+                                    </div>
+                                    <span class="mart-row__subtotal">&#8369;{item.lineTotal}</span>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+
+                    <!-- RIGHT: summary panel -->
+                    <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-3">
+                        <div class="mart-summary">
+                            <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                                <span class="slds-text-body_small mart-section-label">Wallet</span>
+                                <span class="mart-summary__wallet">&#8369;{clientObj.currencyBalance}</span>
+                            </div>
+
+                            <hr class="mart-divider" />
+
+                            <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                                <span class="slds-text-body_small mart-section-label">Cart Total</span>
+                                <span class="mart-summary__total">&#8369;{clientObj.cartTotal}</span>
+                            </div>
+                            <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-m-top_xx-small">
+                                <span class="slds-text-body_small slds-text-color_weak">Remaining Balance</span>
+                                <span class="mart-summary__remaining">&#8369;{clientObj.remainingBalance}</span>
+                            </div>
+
+                            <div class="slds-m-top_medium">
+                                <lightning-button
+                                    class="mart-buy slds-button_stretch"
+                                    variant="brand"
+                                    label="Buy"
+                                    title="Purchase the items in your cart"
+                                    icon-name="utility:cart"
+                                    disabled={clientObj.buyDisabled}
+                                    onclick={handleBuy}>
+                                </lightning-button>
+                            </div>
+
+                            <hr class="mart-divider" />
+
+                            <p class="slds-text-body_small mart-section-label slds-m-bottom_x-small">You Own</p>
+                            <ul class="mart-owned">
+                                <template for:each={clientObj.ownedItems} for:item="owned">
+                                    <li key={owned.key} class="mart-owned__row slds-grid slds-grid_vertical-align-center slds-grid_align-spread">
+                                        <span class="slds-grid slds-grid_vertical-align-center">
+                                            <img class="mart-owned__icon" src={owned.icon} alt={owned.name} />
+                                            <span class="slds-text-body_small slds-text-color_weak">{owned.name}</span>
+                                        </span>
+                                        <span class="mart-owned__count">{owned.count}</span>
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Empty state: no trainer yet -->
+            <template lwc:if={clientObj.showEmptyState}>
+                <div class="slds-illustration slds-illustration_small slds-p-around_large slds-text-align_center">
+                    <lightning-icon icon-name="utility:user" size="large" alternative-text="No Trainer"></lightning-icon>
+                    <h3 class="slds-text-heading_medium slds-m-top_small">Create a Trainer first</h3>
+                    <p class="slds-text-body_regular slds-text-color_weak slds-m-top_xx-small">
+                        Head to your Trainer dashboard and meet Professor Oak before shopping at the Poke Mart.
+                    </p>
+                </div>
+            </template>
+        </div>
+    </article>
+</template>

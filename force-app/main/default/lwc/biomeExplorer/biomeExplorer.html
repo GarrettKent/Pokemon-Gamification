@@ -1,0 +1,76 @@
+<template>
+    <article class="explorer-panel">
+        <header class="slds-media slds-media_center slds-has-flexi-truncate slds-m-bottom_medium">
+            <div class="slds-media__figure">
+                <span class="poke-ball-mark"></span>
+            </div>
+            <div class="slds-media__body">
+                <h2 class="slds-text-heading_small explorer-title">Explore the Wild</h2>
+            </div>
+        </header>
+
+        <div class="slds-is-relative">
+            <div lwc:if={loading} class="slds-is-relative slds-p-vertical_large">
+                <lightning-spinner size="medium" variant="brand" alternative-text="Loading..."></lightning-spinner>
+            </div>
+
+            <!-- Has trainer -->
+            <div lwc:if={clientObj.hasTrainer} class="slds-show">
+                <!-- Biome picker -->
+                <p class="slds-text-title_caps slds-text-color_weak slds-m-bottom_xx-small">Choose a Biome</p>
+                <div class="slds-grid slds-wrap slds-gutters_x-small slds-m-bottom_medium">
+                    <template for:each={clientObj.biomeTiles} for:item="biome">
+                        <div key={biome.value} class="slds-col slds-size_1-of-3 slds-p-around_xx-small">
+                            <button type="button" class={biome.tileClass} data-biome={biome.value} onclick={selectBiome}>
+                                {biome.label}
+                            </button>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Grass patches -->
+                <div lwc:if={clientObj.hasPatches}>
+                    <div class="slds-grid slds-wrap slds-gutters_x-small">
+                        <template for:each={clientObj.displayPatches} for:item="patch">
+                            <div key={patch.index} class="slds-col slds-size_1-of-3 slds-medium-size_1-of-4 slds-p-around_xx-small">
+                                <button type="button" class="grass-patch slds-button_reset" data-index={patch.index} onclick={openEncounter} disabled={patch.consumed}>
+                                    <div lwc:if={patch.consumed} class="patch-tile patch-tile_searched">
+                                        <lightning-icon icon-name="utility:check" size="small" class="slds-m-bottom_xx-small"></lightning-icon>
+                                        <div class="slds-text-body_small slds-text-color_weak">Searched</div>
+                                    </div>
+                                    <div lwc:else class={patch.grassClass} style={patch.style}></div>
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <div lwc:if={clientObj.hasPatches} class="slds-grid slds-grid_align-end slds-m-top_small">
+                    <span class="ball-pouch">
+                        <template for:each={clientObj.ballPouch} for:item="ball">
+                            <span key={ball.key} class="ball-tally">
+                                <img src={ball.icon} alt={ball.alt} class="ball-sprite" />{ball.count}
+                            </span>
+                        </template>
+                    </span>
+                </div>
+            </div>
+
+            <!-- No trainer yet -->
+            <div lwc:else class="empty-state slds-text-align_center slds-m-around_small">
+                <lightning-icon icon-name="utility:user" size="small" class="slds-m-bottom_xx-small"></lightning-icon>
+                <p>Create a Trainer first to start exploring.</p>
+            </div>
+        </div>
+    </article>
+
+    <c-wild-encounter-modal
+        lwc:if={clientObj.showEncounter}
+        encounter={clientObj.encounter}
+        ball-counts={clientObj.ballCounts}
+        oncaught={handleCaught}
+        onbrokefree={handleBrokeFree}
+        onfled={handleFled}
+        onclose={handleClose}>
+    </c-wild-encounter-modal>
+</template>

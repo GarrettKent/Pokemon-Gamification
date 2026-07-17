@@ -1,0 +1,378 @@
+/* Title: trainerDashboard
+ * Created By: Garrett Kent - 06/20/2026
+ * Purpose: Scoped styling for the Trainer Hub — borderless, elevated trainer ID card with a
+ *          Poke Ball motif. Framing is shadow + radius + spacing, not borders; red (#ee1515)
+ *          is reserved for the Poke Ball accents only.
+ * Modified: Garrett Kent - 06/22/2026 - Equal-height roster grid (CSS grid, stretch), readable borderless pagination footer, page-size combobox auto alignment.
+ * Modified: Garrett Kent - 07/05/2026 - Added Play Pokemon Jazz link (media chip) to the trainer card header.
+ */
+
+/* ---- Trainer ID Card ---- */
+.trainer-card {
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.08), 0 0.5rem 1.25rem rgba(0, 0, 0, 0.1);
+    padding: 1.25rem 1.5rem 1.5rem;
+    overflow: hidden;
+}
+
+.trainer-card__top {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.trainer-card__avatar {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    background-color: #2d2d35;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.18);
+    flex-shrink: 0;
+}
+
+/* Poke Ball ring framing the trainer avatar */
+.trainer-card__avatar-ball {
+    position: absolute;
+    inset: -0.25rem;
+    border-radius: 50%;
+    background: linear-gradient(#ee1515 0 49%, #2d2d35 49% 51%, #ffffff 51% 100%);
+    z-index: -1;
+}
+
+.trainer-card__identity {
+    min-width: 0;
+}
+
+.trainer-card__eyebrow {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.09375rem;
+    text-transform: uppercase;
+    color: #8a8a96;
+    margin-bottom: 0.125rem;
+}
+
+.trainer-card__name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.15;
+    color: #16161a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.trainer-card__rival {
+    font-size: 0.8125rem;
+    color: #8a8a96;
+    margin-top: 0.125rem;
+}
+
+/* ---- Pokemon Jazz link (media chip) ---- */
+.trainer-card__jazz {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-left: auto;
+    flex-shrink: 0;
+    padding: 0.4375rem 0.875rem;
+    border-radius: 9999px;
+    background-color: #2d2d35;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.18);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
+}
+
+.trainer-card__jazz:hover,
+.trainer-card__jazz:focus-visible {
+    background-color: #ee1515;
+    transform: translateY(-0.0625rem);
+    box-shadow: 0 0.375rem 0.75rem rgba(238, 21, 21, 0.28);
+}
+
+/* ---- Currency / XP stat strip ---- */
+.trainer-card__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+.trainer-card__stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    background-color: #f5f6f9;
+    border-radius: 0.5rem;
+    padding: 0.4375rem 0.75rem;
+}
+
+.trainer-card__stat-icon {
+    --slds-c-icon-color-foreground-default: #5c5c66;
+}
+
+.trainer-card__stat-label {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: #16161a;
+}
+
+/* ---- Poke Ball inventory ---- */
+.trainer-card__balls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    /* subtle meaningful divider, not a frame */
+    border-top: 0.0625rem solid #ececf1;
+}
+
+.trainer-card__ball {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4375rem;
+}
+
+/* Authentic in-game ball sprite (static resource) */
+.trainer-card__ball-sprite {
+    width: 1.125rem;
+    height: 1.125rem;
+    object-fit: contain;
+    image-rendering: pixelated;
+    flex-shrink: 0;
+}
+
+.trainer-card__ball-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: #44444c;
+}
+
+/* ---- Roster heading ---- */
+.roster-heading {
+    display: flex;
+    align-items: center;
+    margin: 1.75rem 0 0.75rem;
+}
+
+.roster-heading__text {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: #16161a;
+}
+
+.trainer-card__ball-dot {
+    display: inline-block;
+    width: 0.875rem;
+    height: 0.875rem;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    background: linear-gradient(#ee1515 0 47%, #1a1a1a 47% 53%, #ffffff 53% 100%);
+    box-shadow: inset 0 0 0 0.0625rem rgba(0, 0, 0, 0.25);
+}
+
+/* ---- Roster toolbar: search + sort + filter toggle ---- */
+.roster-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.roster-toolbar__search {
+    flex: 1 1 16rem;
+    min-width: 12rem;
+}
+
+.roster-toolbar__sort {
+    display: flex;
+    gap: 0.5rem;
+    flex: 0 1 auto;
+}
+
+.roster-toolbar__sort lightning-combobox {
+    min-width: 8.5rem;
+}
+
+.roster-toolbar__filter-toggle {
+    flex: 0 0 auto;
+}
+
+/* ---- Filter panel: borderless, soft elevation ---- */
+.roster-filters {
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.08), 0 0.5rem 1.25rem rgba(0, 0, 0, 0.1);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.roster-filters__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.roster-filters__types {
+    flex: 1 1 18rem;
+}
+
+.roster-filters__levels {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 0 1 12rem;
+}
+
+.roster-filters__actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+/* ---- Roster tiles: equal-height/equal-width grid; cards stretch to fill their cell, no boxed frame ---- */
+.roster-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    align-items: stretch;
+    gap: 0.75rem;
+}
+
+.roster-tile {
+    display: flex;
+}
+
+/* Card host fills the cell so every tile in a row matches the tallest card's height */
+.roster-tile c-pokemon-card {
+    display: flex;
+    flex: 1;
+}
+
+/* ---- Pagination footer: count anchored left, nav + page label grouped right, wraps on mobile ---- */
+.roster-pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    margin-top: 1.25rem;
+}
+
+.roster-pager__count {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #5c5c66;
+    font-variant-numeric: tabular-nums;
+}
+
+.roster-pager__nav {
+    display: flex;
+    align-items: center;
+    gap: 0.125rem;
+}
+
+/* Page label reads as the strong center anchor between the prev/next steppers */
+.roster-pager__page {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: #16161a;
+    font-variant-numeric: tabular-nums;
+    padding: 0 0.5rem;
+    white-space: nowrap;
+}
+
+.roster-pager__step {
+    --slds-c-button-text-color: #5c5c66;
+    --slds-c-button-text-color-hover: #16161a;
+}
+
+/* On narrow viewports the count stacks above a full-width centered nav row */
+@media (max-width: 30rem) {
+    .roster-pager {
+        justify-content: center;
+        text-align: center;
+    }
+
+    .roster-pager__count {
+        flex: 1 1 100%;
+        text-align: center;
+    }
+
+    .roster-pager__nav {
+        flex: 1 1 100%;
+        justify-content: center;
+    }
+}
+
+/* ---- Page-size footer ---- */
+.roster-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.roster-footer__label {
+    font-size: 0.8125rem;
+    color: #8a8a96;
+}
+
+.roster-footer__select {
+    width: 5.5rem;
+}
+
+/* ---- Empty / start panels: rounded, elevated, borderless ---- */
+.empty-panel {
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.08), 0 0.5rem 1.25rem rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    margin-top: 1rem;
+}
+
+.empty-panel__ball {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    margin-bottom: 0.75rem;
+    background-color: #2d2d35;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+}
+
+.empty-panel__title {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: #16161a;
+    margin-bottom: 0.25rem;
+}
+
+.empty-panel__hint {
+    font-size: 0.875rem;
+    color: #8a8a96;
+}
+
+.empty-panel__cta {
+    margin-top: 1rem;
+}
+
+/* No-matches state: same borderless frame, lighter padding, distinct from the empty roster */
+.empty-panel_subtle {
+    padding: 1.75rem 1.5rem;
+}

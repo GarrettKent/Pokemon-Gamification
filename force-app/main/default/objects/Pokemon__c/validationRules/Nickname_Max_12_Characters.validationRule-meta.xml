@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Nickname_Max_12_Characters</fullName>
+    <active>true</active>
+    <description>ISCHANGED only (never fires on insert) so evolution can carry over a grandfathered longer nickname — the evolve path re-inserts the record and must not re-validate legacy names.</description>
+    <errorConditionFormula>ISCHANGED(Nickname__c) &amp;&amp; LEN(Nickname__c) &gt; 12</errorConditionFormula>
+    <errorDisplayField>Nickname__c</errorDisplayField>
+    <errorMessage>Nicknames are limited to 12 characters.</errorMessage>
+</ValidationRule>

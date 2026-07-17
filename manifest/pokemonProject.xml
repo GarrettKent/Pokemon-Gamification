@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  pokemonProject.xml — the complete manifest for the LSC - Poke package (Phase 1 + 2a merged).
+  Created By: Garrett Kent - 06/20/2026
+  Modified: Garrett Kent - 07/06/2026 - Merged phase2Items.xml (reward engine + Pokemon_Reward_Rule__mdt);
+            trued up to disk (tabs, flexipages, Pokemon_Type global value set, remaining settings fields)
+-->
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+
+    <types>
+        <members>Pokemon_Trainer__c</members>
+        <members>Pokemon__c</members>
+        <members>Pokemon_Settings__mdt</members>
+        <members>Pokemon_Biome__mdt</members>
+        <members>Pokemon_Reward_Rule__mdt</members>
+        <name>CustomObject</name>
+    </types>
+
+    <types>
+        <members>Pokemon_Trainer__c.Trainer_Key__c</members>
+        <members>Pokemon_Trainer__c.Currency__c</members>
+        <members>Pokemon_Trainer__c.Currency_Today__c</members>
+        <members>Pokemon_Trainer__c.Earn_Date__c</members>
+        <members>Pokemon_Trainer__c.Experience_Tokens__c</members>
+        <members>Pokemon_Trainer__c.Poke_Balls__c</members>
+        <members>Pokemon_Trainer__c.Great_Balls__c</members>
+        <members>Pokemon_Trainer__c.Ultra_Balls__c</members>
+        <members>Pokemon_Trainer__c.Master_Balls__c</members>
+        <members>Pokemon_Trainer__c.Fire_Stones__c</members>
+        <members>Pokemon_Trainer__c.Water_Stones__c</members>
+        <members>Pokemon_Trainer__c.Thunder_Stones__c</members>
+        <members>Pokemon_Trainer__c.Leaf_Stones__c</members>
+        <members>Pokemon_Trainer__c.Moon_Stones__c</members>
+        <members>Pokemon_Trainer__c.Shiny_Stones__c</members>
+        <members>Pokemon_Trainer__c.Dusk_Stones__c</members>
+        <members>Pokemon_Trainer__c.Dawn_Stones__c</members>
+        <members>Pokemon_Trainer__c.Rival__c</members>
+        <members>Pokemon_Trainer__c.Automation_Opt_In__c</members>
+        <members>Pokemon_Trainer__c.Consumed_Encounters__c</members>
+        <members>Pokemon_Trainer__c.Total_Pokemon__c</members>
+        <members>Pokemon_Trainer__c.Shiny_Pokemon__c</members>
+        <members>Pokemon_Trainer__c.Highest_Level__c</members>
+        <members>Pokemon_Trainer__c.Total_EXP_Points__c</members>
+        <members>Pokemon__c.Pokemon_Trainer__c</members>
+        <members>Pokemon__c.Species_Name__c</members>
+        <members>Pokemon__c.Sprite__c</members>
+        <members>Pokemon__c.Nickname__c</members>
+        <members>Pokemon__c.Pokedex_Number__c</members>
+        <members>Pokemon__c.Level__c</members>
+        <members>Pokemon__c.EXP_Points__c</members>
+        <members>Pokemon__c.Image__c</members>
+        <members>Pokemon__c.Type__c</members>
+        <members>Pokemon__c.Type_2__c</members>
+        <members>Pokemon__c.HP__c</members>
+        <members>Pokemon__c.Attack__c</members>
+        <members>Pokemon__c.Defense__c</members>
+        <members>Pokemon__c.Special_Attack__c</members>
+        <members>Pokemon__c.Special_Defense__c</members>
+        <members>Pokemon__c.Speed__c</members>
+        <members>Pokemon__c.Move_1__c</members>
+        <members>Pokemon__c.Move_2__c</members>
+        <members>Pokemon__c.Move_3__c</members>
+        <members>Pokemon__c.Move_4__c</members>
+        <members>Pokemon__c.Is_Traded__c</members>
+        <members>Pokemon__c.Is_Shiny__c</members>
+        <members>Pokemon__c.Capture_Rate__c</members>
+        <members>Pokemon__c.Can_Evolve__c</members>
+        <members>Pokemon_Settings__mdt.Automation_Enabled__c</members>
+        <members>Pokemon_Settings__mdt.Daily_Total_Currency_Cap__c</members>
+        <members>Pokemon_Settings__mdt.Catch_Level_Min__c</members>
+        <members>Pokemon_Settings__mdt.Catch_Level_Max__c</members>
+        <members>Pokemon_Settings__mdt.Catch_Rate_Multiplier__c</members>
+        <members>Pokemon_Settings__mdt.Common_Level_Offset_Min__c</members>
+        <members>Pokemon_Settings__mdt.Common_Level_Offset_Max__c</members>
+        <members>Pokemon_Settings__mdt.Uncommon_Level_Offset_Min__c</members>
+        <members>Pokemon_Settings__mdt.Uncommon_Level_Offset_Max__c</members>
+        <members>Pokemon_Settings__mdt.Rare_Level_Offset_Min__c</members>
+        <members>Pokemon_Settings__mdt.Rare_Level_Offset_Max__c</members>
+        <members>Pokemon_Settings__mdt.Flee_Chance_Common__c</members>
+        <members>Pokemon_Settings__mdt.Flee_Chance_Uncommon__c</members>
+        <members>Pokemon_Settings__mdt.Flee_Chance_Rare__c</members>
+        <members>Pokemon_Settings__mdt.Critical_Capture_Rate__c</members>
+        <members>Pokemon_Settings__mdt.Shiny_Rate__c</members>
+        <members>Pokemon_Settings__mdt.Poke_Ball_Price__c</members>
+        <members>Pokemon_Settings__mdt.Great_Ball_Price__c</members>
+        <members>Pokemon_Settings__mdt.Ultra_Ball_Price__c</members>
+        <members>Pokemon_Settings__mdt.Stone_Price__c</members>
+        <members>Pokemon_Settings__mdt.Master_Ball_Dex_Milestone__c</members>
+        <members>Pokemon_Reward_Rule__mdt.Active__c</members>
+        <members>Pokemon_Reward_Rule__mdt.SObject_API_Name__c</members>
+        <members>Pokemon_Reward_Rule__mdt.Run_On__c</members>
+        <members>Pokemon_Reward_Rule__mdt.Edge_Field__c</members>
+        <members>Pokemon_Reward_Rule__mdt.Done_Values__c</members>
+        <members>Pokemon_Reward_Rule__mdt.Filter_Field__c</members>
+        <members>Pokemon_Reward_Rule__mdt.Filter_Values__c</members>
+        <members>Pokemon_Reward_Rule__mdt.Exclude_Field__c</members>
+        <members>Pokemon_Reward_Rule__mdt.Exclude_Values__c</members>
+        <members>Pokemon_Reward_Rule__mdt.Currency__c</members>
+        <members>Pokemon_Reward_Rule__mdt.XP__c</members>
+        <members>Pokemon_Reward_Rule__mdt.Multiplier_Field__c</members>
+        <members>Pokemon_Reward_Rule__mdt.Multiplier_Cap__c</members>
+        <members>Pokemon_Reward_Rule__mdt.Description__c</members>
+        <name>CustomField</name>
+    </types>
+
+    <types>
+        <members>Pokemon__c.Traded_Cannot_Rename</members>
+        <members>Pokemon__c.Is_Traded_Cannot_Revert</members>
+        <members>Pokemon__c.Level_Cannot_Decrease</members>
+        <members>Pokemon__c.Level_Must_Be_1_To_100</members>
+        <members>Pokemon__c.EXP_Cannot_Be_Negative</members>
+        <members>Pokemon__c.EXP_Cannot_Decrease</members>
+        <members>Pokemon__c.Species_Cannot_Change</members>
+        <members>Pokemon__c.Pokedex_Must_Be_Valid</members>
+        <members>Pokemon__c.Nickname_Max_12_Characters</members>
+        <members>Pokemon_Trainer__c.Cannot_Be_Own_Rival</members>
+        <name>ValidationRule</name>
+    </types>
+
+    <!-- Config rows: settings + the 6 biomes. NO Pokemon_Reward_Rule rows ship — subscribers create them. -->
+    <types>
+        <members>Pokemon_Settings.Default</members>
+        <members>Pokemon_Biome.Verdant_Meadow</members>
+        <members>Pokemon_Biome.Rocky_Cavern</members>
+        <members>Pokemon_Biome.Azure_Shore</members>
+        <members>Pokemon_Biome.Mystic_Mirage</members>
+        <members>Pokemon_Biome.Scorched_Summit</members>
+        <members>Pokemon_Biome.Spectral_Graveyard</members>
+        <name>CustomMetadata</name>
+    </types>
+
+    <types>
+        <members>pokemonGameController</members>
+        <members>pokemonGameHelper</members>
+        <members>pokemonCatchLogic</members>
+        <members>PokemonSpeciesService</members>
+        <members>pokemonTrainerOrgHelper</members>
+        <members>PokemonRewardEngine</members>
+        <members>pokemonGameController_Test</members>
+        <members>pokemonCatchLogic_Test</members>
+        <members>PokemonSpeciesService_Test</members>
+        <members>pokemonTrainerOrgHelper_Test</members>
+        <members>PokemonRewardEngine_Test</members>
+        <name>ApexClass</name>
+    </types>
+
+    <!-- The only packaged trigger — source-object hooks are subscriber-owned (see the PokemonRewardEngine header). -->
+    <types>
+        <members>pokemonTrainerOrgTrigger</members>
+        <name>ApexTrigger</name>
+    </types>
+
+    <types>
+        <members>professorOakOnboarding</members>
+        <members>trainerDashboard</members>
+        <members>pokeMartContainer</members>
+        <members>biomeExplorer</members>
+        <members>wildEncounterModal</members>
+        <members>pokemonCard</members>
+        <members>pokemonApiService</members>
+        <members>pokemonBasics</members>
+        <name>LightningComponentBundle</name>
+    </types>
+
+    <types>
+        <members>pokemonSpeciesSeed</members>
+        <members>professorOak</members>
+        <members>tallGrassSway</members>
+        <members>pokeBallIcon</members>
+        <members>greatBallIcon</members>
+        <members>ultraBallIcon</members>
+        <members>masterBallIcon</members>
+        <members>fireStoneIcon</members>
+        <members>leafStoneIcon</members>
+        <members>moonStoneIcon</members>
+        <members>thunderStoneIcon</members>
+        <members>waterStoneIcon</members>
+        <members>shinyStoneIcon</members>
+        <members>duskStoneIcon</members>
+        <members>dawnStoneIcon</members>
+        <name>StaticResource</name>
+    </types>
+
+    <types>
+        <members>Pokemon_Full_Access</members>
+        <name>PermissionSet</name>
+    </types>
+
+    <types>
+        <members>PokeAPI</members>
+        <members>PokeApiSprites</members>
+        <name>CspTrustedSite</name>
+    </types>
+
+    <types>
+        <members>Pokemon_Type</members>
+        <name>GlobalValueSet</name>
+    </types>
+
+    <types>
+        <members>Pokemon_Home</members>
+        <name>CustomApplication</name>
+    </types>
+
+    <types>
+        <members>Trainer_Hub</members>
+        <members>Biomes</members>
+        <members>Poke_Mart</members>
+        <members>Pokemon__c</members>
+        <members>Pokemon_Trainer__c</members>
+        <name>CustomTab</name>
+    </types>
+
+    <types>
+        <members>Trainer_Hub</members>
+        <members>Biomes</members>
+        <members>Poke_Mart</members>
+        <name>FlexiPage</name>
+    </types>
+
+    <types>
+        <members>Pokemon__c.Pokemon_Compact</members>
+        <members>Pokemon_Trainer__c.Trainer_Compact</members>
+        <name>CompactLayout</name>
+    </types>
+
+    <types>
+        <members>Pokemon__c-Pokemon Layout</members>
+        <members>Pokemon_Trainer__c-Pokemon Trainer Layout</members>
+        <name>Layout</name>
+    </types>
+
+    <types>
+        <members>Pokemon__c.All_Pokemon</members>
+        <members>Pokemon__c.My_Pokemon</members>
+        <members>Pokemon_Trainer__c.All</members>
+        <name>ListView</name>
+    </types>
+
+    <version>64.0</version>
+</Package>

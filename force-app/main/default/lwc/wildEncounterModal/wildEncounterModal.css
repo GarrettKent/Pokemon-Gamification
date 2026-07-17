@@ -1,0 +1,285 @@
+/* Title: wildEncounterModal
+ * Created By: Garrett Kent - 06/20/2026
+ * Purpose: Encounter-stage and outcome styling — elevation + rounded panels over boxed borders, monospace dex, type-colored chips driven by inline styles from c/pokemonApiService.
+ * Modified: Garrett Kent - 06/21/2026 - Capture juice: finite wobble, critical-capture wobble, ball snap, and Gotcha star-burst animations
+ * Modified: Garrett Kent - 07/05/2026 - Battle-scene resize: compact modal, boxless vertical bag rail, identity row under the stage, and the thrown-ball takeover (wobble/snap/burst now play on the ball)
+ */
+@keyframes pokemon-shake {
+    0% { transform: translateX(0) rotate(0deg); }
+    15% { transform: translateX(-6px) rotate(-6deg); }
+    30% { transform: translateX(6px) rotate(6deg); }
+    45% { transform: translateX(-5px) rotate(-5deg); }
+    60% { transform: translateX(5px) rotate(5deg); }
+    75% { transform: translateX(-3px) rotate(-3deg); }
+    90% { transform: translateX(3px) rotate(3deg); }
+    100% { transform: translateX(0) rotate(0deg); }
+}
+
+/* Bottom-center origin so the thrown ball rocks on its ground-contact point instead of spinning in place. */
+.pokemon-shake {
+    animation: pokemon-shake 0.8s ease-in-out infinite;
+    transform-origin: 50% 100%;
+}
+
+/* Finite three-wobble — same rock motion as pokemon-shake but capped at 3 iterations so onanimationend fires. */
+.pokemon-wobble {
+    animation: pokemon-shake 0.5s ease-in-out 3;
+    transform-origin: 50% 100%;
+}
+
+/* Critical Capture — one big, fast rock to telegraph the near-instant catch. */
+@keyframes pokemon-crit-wobble {
+    0% { transform: translateX(0) rotate(0deg); }
+    20% { transform: translateX(-12px) rotate(-12deg); }
+    45% { transform: translateX(12px) rotate(12deg); }
+    70% { transform: translateX(-9px) rotate(-9deg); }
+    100% { transform: translateX(0) rotate(0deg); }
+}
+
+.pokemon-crit-wobble {
+    animation: pokemon-crit-wobble 0.45s ease-in-out 1;
+    transform-origin: 50% 100%;
+}
+
+/* Ball snap — quick scale pop the instant the catch lands. */
+@keyframes pokemon-snap {
+    0% { transform: scale(1); }
+    40% { transform: scale(0.78); }
+    70% { transform: scale(1.12); }
+    100% { transform: scale(1); }
+}
+
+.pokemon-snap {
+    animation: pokemon-snap 0.35s ease-out 1;
+}
+
+/* Gotcha! radial star-burst — pure-CSS rays that flash once, ringed around the settled ball. */
+@keyframes gotcha-burst {
+    0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+    35% { opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.4); opacity: 0; }
+}
+
+.gotcha-burst {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10rem;
+    height: 10rem;
+    transform: translate(-50%, -50%) scale(0.2);
+    pointer-events: none;
+    z-index: 0;
+    background: repeating-conic-gradient(
+        from 0deg,
+        #ffd33d 0deg 12deg,
+        transparent 12deg 30deg
+    );
+    -webkit-mask-image: radial-gradient(circle, transparent 28%, #000 30%, #000 60%, transparent 64%);
+    mask-image: radial-gradient(circle, transparent 28%, #000 30%, #000 60%, transparent 64%);
+    animation: gotcha-burst 0.7s ease-out 1;
+}
+
+/* Compact battle-scene modal — no more full-screen takeover. */
+.encounter-modal .slds-modal__container {
+    max-width: 44rem;
+    width: calc(100% - 3rem);
+}
+
+/* The content panel carries the white surface; the container's padding zones stay transparent over the backdrop. */
+.encounter-modal .slds-modal__content {
+    background-color: #fff;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+}
+
+/* Arena + bag rail side by side; the rail folds under the stage on narrow screens. */
+.encounter-layout {
+    display: flex;
+    gap: 1.25rem;
+    align-items: stretch;
+}
+
+.encounter-arena {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* Battle stage for the wild sprite — soft elevation and rounded corners instead of a hard outline. */
+.encounter-stage {
+    position: relative;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background-color: #f7f9e8;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.encounter-stage__grass {
+    height: 0.5rem;
+    background-color: #7ac74c;
+}
+
+.encounter-stage__sprite {
+    height: 14rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0 1rem;
+}
+
+/* Tall-grass floor line under the sprite. */
+.encounter-stage__sprite::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1.25rem;
+    background-color: #7ac74c;
+    opacity: 0.35;
+}
+
+.encounter-sprite {
+    width: 11.5rem;
+    height: 11.5rem;
+    object-fit: contain;
+}
+
+/* Thrown ball takes the Pokemon's spot — rocks on the grass line, stars pop around it on a catch. */
+.thrown-ball {
+    position: relative;
+    margin-bottom: 1.25rem;
+}
+
+.thrown-ball__sprite {
+    width: 4.5rem;
+    height: 4.5rem;
+    object-fit: contain;
+    image-rendering: pixelated;
+    position: relative;
+    z-index: 1;
+}
+
+/* Identity row under the stage — dex, name, and level at a glance. */
+.encounter-identity {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.encounter-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+/* Zero-padded dex number — monospace reads like a real Pokedex entry. */
+.encounter-dex {
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: #8a8a8a;
+    letter-spacing: 0.04em;
+}
+
+/* Outcome zone — reserved height keeps the modal from resizing when the banner and Done land. */
+.encounter-outcome {
+    min-height: 6.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+}
+
+/* Outcome banners — keep the success/warning color fill but trade the boxed frame for rounded, borderless elevation. */
+.outcome-banner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Bag rail — boxless ball pockets stacked beside the stage; the sprites are the buttons. */
+.ball-rail {
+    flex: 0 0 5.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: 0.5rem;
+}
+
+/* Caught: keep the rail's space reserved so the ball and burst do not shift mid-animation. */
+.ball-rail_hidden {
+    visibility: hidden;
+}
+
+.ball-rail__label {
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #8a94a0;
+}
+
+/* Throw buttons — just the ball sprite and its count, no tile box; hover lifts the ball out of the pocket. */
+.ball-throw {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.25rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: transform 0.1s ease-in-out;
+}
+
+.ball-throw:hover:not([disabled]) {
+    transform: translateY(-3px) scale(1.08);
+}
+
+.ball-throw[disabled] {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.ball-throw__sprite {
+    width: 2.5rem;
+    height: 2.5rem;
+    object-fit: contain;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+}
+
+.ball-throw__count {
+    font-family: monospace;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: #44444c;
+}
+
+/* Narrow phones: the rail folds under the stage as a horizontal row. Last in the file so it wins the cascade over the base .ball-rail column. */
+@media (max-width: 30rem) {
+    .encounter-layout {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .ball-rail {
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .ball-rail__label {
+        display: none;
+    }
+
+    .encounter-outcome {
+        min-height: 3rem;
+    }
+}

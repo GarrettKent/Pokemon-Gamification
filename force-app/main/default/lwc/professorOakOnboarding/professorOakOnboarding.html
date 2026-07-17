@@ -1,0 +1,124 @@
+<template>
+    <section role="dialog" tabindex="-1" aria-modal="true" aria-label="Professor Oak's Lab" class="slds-modal slds-fade-in-open slds-modal_full">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={handleClose}>
+                    <lightning-icon icon-name="utility:close" size="small" alternative-text="Close" variant="inverse"></lightning-icon>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <div class="slds-grid slds-grid_vertical-align-center">
+                    <lightning-icon icon-name="utility:knowledge_base" alternative-text="Professor Oak" size="small" class="slds-m-right_small"></lightning-icon>
+                    <h1 class="slds-text-heading_medium">Professor Oak's Lab</h1>
+                </div>
+            </header>
+
+            <div class="slds-modal__content slds-p-around_medium">
+                <div class="slds-grid slds-gutters_small slds-m-bottom_medium">
+                    <div class="slds-col slds-no-flex">
+                        <img src={oakImageUrl} alt="Professor Oak" onerror={handleImageError} style="width: 88px; height: 88px; object-fit: contain;" />
+                    </div>
+                    <div class="slds-col slds-align-middle">
+                        <div class="oak-bubble oak-panel slds-text-body_regular">{clientObj.oakLine}</div>
+                    </div>
+                </div>
+
+                <template lwc:if={loading}>
+                    <div class="slds-is-relative slds-p-vertical_large">
+                        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                    </div>
+                </template>
+
+                <template lwc:if={clientObj.isWelcome}>
+                    <div class="oak-panel slds-text-align_center">
+                        <span class="poke-ball-mark poke-ball-mark_hero slds-m-bottom_small" role="img" aria-label="Poke Ball"></span>
+                        <p class="slds-text-body_regular">My name is Oak. People affectionately call me the Pokemon Professor. This world is inhabited by creatures called Pokemon. Let's get your journey started!</p>
+                    </div>
+                </template>
+
+                <template lwc:if={clientObj.isName}>
+                    <lightning-input
+                        type="text"
+                        label="Trainer Name"
+                        value={clientObj.trainerName}
+                        onchange={handleNameChange}
+                        max-length="80"
+                        required>
+                    </lightning-input>
+                </template>
+
+                <template lwc:if={clientObj.isRival}>
+                    <lightning-combobox
+                        label="Rival"
+                        value={clientObj.rivalTrainerId}
+                        options={rivalOptions}
+                        onchange={handleRivalChange}
+                        placeholder="No rival">
+                    </lightning-combobox>
+                </template>
+
+                <template lwc:if={clientObj.isStarter}>
+                    <div class="slds-grid slds-wrap slds-grid_align-center">
+                        <template for:each={clientObj.decoratedStarters} for:item="starter">
+                            <div key={starter.id} class="slds-col slds-size_1-of-2 slds-medium-size_1-of-3">
+                                <div
+                                    class={starter.selectedClass}
+                                    data-id={starter.id}
+                                    onclick={handleStarterSelect}
+                                    role="button"
+                                    tabindex="0">
+                                    <img
+                                        src={starter.artworkUrl}
+                                        alt={starter.name}
+                                        onerror={handleImageError}
+                                        style="width: 96px; height: 96px; object-fit: contain;" />
+                                    <div class="slds-text-title_caps slds-truncate slds-m-top_xx-small">{starter.name}</div>
+                                    <div class="slds-grid slds-grid_align-center slds-m-top_xx-small">
+                                        <span class="slds-badge slds-m-right_xx-small" style={starter.typeStyle1}>{starter.type1}</span>
+                                        <template lwc:if={starter.type2}>
+                                            <span class="slds-badge" style={starter.typeStyle2}>{starter.type2}</span>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <template lwc:if={clientObj.isCreating}>
+                    <div class="slds-is-relative slds-p-vertical_large slds-text-align_center">
+                        <lightning-spinner alternative-text="Creating your trainer" size="medium"></lightning-spinner>
+                    </div>
+                </template>
+
+                <template lwc:if={clientObj.isDone}>
+                    <div class="oak-panel slds-text-align_center">
+                        <lightning-icon icon-name="utility:success" alternative-text="Done" size="large" variant="success" class="slds-m-bottom_small"></lightning-icon>
+                        <p class="slds-text-heading_small">You're all set!</p>
+                    </div>
+                </template>
+            </div>
+
+            <footer class="slds-modal__footer">
+                <template lwc:if={clientObj.isWelcome}>
+                    <lightning-button variant="brand" label="Let's Go" onclick={handleNext}></lightning-button>
+                </template>
+
+                <template lwc:if={clientObj.isName}>
+                    <lightning-button label="Back" onclick={handleBack} class="slds-m-right_x-small"></lightning-button>
+                    <lightning-button variant="brand" label="Next" onclick={handleNext}></lightning-button>
+                </template>
+
+                <template lwc:if={clientObj.isRival}>
+                    <lightning-button label="Back" onclick={handleBack} class="slds-m-right_x-small"></lightning-button>
+                    <lightning-button variant="brand" label="Next" onclick={handleNext}></lightning-button>
+                </template>
+
+                <template lwc:if={clientObj.isStarter}>
+                    <lightning-button label="Back" onclick={handleBack} class="slds-m-right_x-small"></lightning-button>
+                    <lightning-button variant="brand" label="Begin Adventure" onclick={handleBeginAdventure} disabled={clientObj.starterNotChosen}></lightning-button>
+                </template>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>

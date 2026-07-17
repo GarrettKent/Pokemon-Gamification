@@ -1,0 +1,74 @@
+<template>
+    <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="encounter-heading" class="slds-modal slds-fade-in-open encounter-modal">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={handleClose} disabled={loading}>
+                    <lightning-icon icon-name="utility:close" size="small" alternative-text="Close" variant="inverse"></lightning-icon>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <div class="slds-grid slds-grid_vertical-align-center slds-grid_align-center">
+                    <lightning-icon icon-name="utility:animal_and_nature" alternative-text="Wild encounter" size="small" class="slds-m-right_small"></lightning-icon>
+                    <h1 id="encounter-heading" class="slds-text-heading_medium">A wild Pokemon appeared!</h1>
+                </div>
+            </header>
+
+            <div class="slds-modal__content slds-p-around_medium">
+                <div class="encounter-layout">
+                    <div class="encounter-arena">
+                        <div class="encounter-stage">
+                            <div class="encounter-stage__grass"></div>
+                            <div class="encounter-stage__sprite">
+                                <div lwc:if={clientObj.showBall} class="thrown-ball">
+                                    <div class={clientObj.shakeClass} onanimationend={handleWobbleEnd}>
+                                        <div class={clientObj.snapClass}>
+                                            <img src={clientObj.thrownBallIcon} alt="Thrown ball" class="thrown-ball__sprite" />
+                                        </div>
+                                    </div>
+                                    <div lwc:if={clientObj.showBurst} class="gotcha-burst" aria-hidden="true"></div>
+                                </div>
+                                <img lwc:else src={clientObj.spriteSrc} alt={encounter.name} onerror={handleImageError} class="encounter-sprite" />
+                            </div>
+                        </div>
+
+                        <div class="encounter-identity slds-m-top_small">
+                            <span class="encounter-dex">{clientObj.dexDisplay}</span>
+                            <span class="encounter-name slds-m-left_x-small">{encounter.name}</span>
+                            <span class="slds-badge slds-badge_lightest slds-m-left_small">Lv. {encounter.level}</span>
+                        </div>
+                        <div class="slds-grid slds-grid_align-center slds-m-top_x-small">
+                            <span class="slds-badge slds-m-right_xx-small" style={clientObj.type1Style}>{encounter.type1}</span>
+                            <span lwc:if={clientObj.hasSecondType} class="slds-badge" style={clientObj.type2Style}>{encounter.type2}</span>
+                        </div>
+
+                        <!-- Outcome zone: height reserved so the modal never resizes when a banner lands -->
+                        <div class="encounter-outcome">
+                            <div lwc:if={clientObj.isCaught} class="outcome-banner slds-theme_success">
+                                <lightning-icon icon-name="utility:success" size="small" variant="inverse" class="slds-m-right_x-small"></lightning-icon>
+                                Gotcha! {encounter.name} was caught!
+                            </div>
+                            <div lwc:if={clientObj.brokeFree} class="outcome-banner slds-theme_warning">
+                                <lightning-icon icon-name="utility:refresh" size="small" class="slds-m-right_x-small"></lightning-icon>
+                                Argh! The wild {encounter.name} broke free! Throw another ball.
+                            </div>
+                            <div lwc:if={clientObj.isCaught}>
+                                <lightning-button label="Done" variant="brand" onclick={handleClose}></lightning-button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bag rail: pick the actual ball to throw. Stays mounted (hidden) on a catch so the stage width never jumps. -->
+                    <div class={clientObj.railClass}>
+                        <div class="ball-rail__label slds-text-title_caps">Bag</div>
+                        <template for:each={clientObj.ballButtons} for:item="ball">
+                            <button key={ball.key} type="button" class="ball-throw" title={ball.title} data-ball={ball.key} onclick={throwBall} disabled={ball.disabled}>
+                                <img src={ball.icon} alt={ball.label} class="ball-throw__sprite" />
+                                <span class="ball-throw__count">x {ball.count}</span>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>

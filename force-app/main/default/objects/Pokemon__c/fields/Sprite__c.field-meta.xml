@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Sprite__c</fullName>
+    <label>Sprite</label>
+    <formula>IMAGE(Image__c, Species_Name__c, 40, 40)</formula>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

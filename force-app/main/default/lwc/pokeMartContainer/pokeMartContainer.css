@@ -1,0 +1,224 @@
+/* Title: pokeMartContainer
+ * Created By: Garrett Kent - 06/20/2026
+ * Modified: Garrett Kent - 06/21/2026 - Added Evolution Stone glyph styling.
+ * Modified: Garrett Kent - 06/22/2026 - Real stone sprites; right-hand summary panel; removed dead glyph/wallet/checkout rules.
+ * Modified: Garrett Kent - 06/22/2026 - Added Shiny/Dusk/Dawn evolution stones
+ * Modified: Garrett Kent - 07/05/2026 - Dense shelf rows with quantity steppers replace the per-item cards
+ */
+.mart-card {
+    border: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 6px 16px rgba(0, 0, 0, 0.08);
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.mart-header {
+    background-color: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    padding: 1.1rem 1.25rem 1.25rem;
+}
+
+.mart-header__title {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #1a1a1a;
+}
+
+.mart-pokeball-mark {
+    display: inline-flex;
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.mart-section-label {
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    color: #8a94a0;
+}
+
+/* Shop shelves — one elevated rounded group per section, dense line-item rows inside. */
+.mart-shelf {
+    margin: 0;
+    background-color: #ffffff;
+    border-radius: 0.625rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.07);
+    padding: 0.35rem 0.5rem;
+}
+
+.mart-row {
+    padding: 0.4rem 0.5rem;
+    border-radius: 0.5rem;
+    gap: 0.75rem;
+    transition: background-color 0.15s ease;
+}
+
+.mart-row:hover {
+    background-color: #f7f9fc;
+}
+
+.mart-row__icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    flex-shrink: 0;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.mart-row__name {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.mart-row__price {
+    flex: 0 0 3.75rem;
+    text-align: right;
+    font-family: monospace;
+    font-weight: 700;
+    color: #2b3a4a;
+}
+
+.mart-row__stepper {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Round +/- stepper buttons — borderless, soft fill. */
+.mart-step {
+    width: 1.6rem;
+    height: 1.6rem;
+    border: none;
+    border-radius: 50%;
+    background-color: #f4f6f9;
+    color: #2b3a4a;
+    font-weight: 700;
+    font-size: 0.9rem;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+}
+
+.mart-step:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.mart-row__qty {
+    width: 2.75rem;
+    text-align: center;
+    font-family: monospace;
+    font-weight: 700;
+    color: #1a1a1a;
+    border: none;
+    border-radius: 0.375rem;
+    background-color: #f4f6f9;
+    padding: 0.25rem 0.2rem;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.mart-row__qty::-webkit-outer-spin-button,
+.mart-row__qty::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.mart-row__subtotal {
+    flex: 0 0 4.5rem;
+    text-align: right;
+    font-family: monospace;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+/* Narrow phones: rows break into two lines — icon/name/price up top, stepper + subtotal below. */
+@media (max-width: 30rem) {
+    .mart-row {
+        flex-wrap: wrap;
+        row-gap: 0.35rem;
+    }
+
+    .mart-row__stepper {
+        margin-left: 2.5rem;
+    }
+
+    .mart-row__subtotal {
+        margin-left: auto;
+    }
+}
+
+/* Summary panel — wallet, cart math, owned inventory, and the Buy CTA. Prominent via fill + elevation, not a border. */
+.mart-summary {
+    background-color: #f4f6f9;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 6px 16px rgba(0, 0, 0, 0.08);
+    padding: 1.1rem 1.2rem;
+    position: sticky;
+    top: 0.75rem;
+}
+
+.mart-summary__wallet {
+    font-family: monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.mart-summary__total {
+    font-family: monospace;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.mart-summary__remaining {
+    font-family: monospace;
+    font-weight: 600;
+    color: #5c6873;
+}
+
+/* Owned-inventory list — quiet rows, sprite + name + count. */
+.mart-owned {
+    margin: 0;
+}
+
+.mart-owned__row {
+    padding: 0.3rem 0;
+}
+
+.mart-owned__icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    flex-shrink: 0;
+    margin-right: 0.55rem;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.mart-owned__count {
+    font-family: monospace;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.mart-divider {
+    border: none;
+    border-top: 1px solid #e2e6ea;
+    margin: 0.75rem 0;
+}
+
+/* The single sparing red accent: the Buy CTA. */
+.mart-buy {
+    --slds-c-button-brand-color-background: #ee1515;
+    --slds-c-button-brand-color-border: #ee1515;
+    --slds-c-button-brand-color-background-hover: #c81111;
+    --slds-c-button-brand-color-border-hover: #c81111;
+    --slds-c-button-brand-color-background-active: #c81111;
+    --slds-c-button-brand-color-border-active: #c81111;
+    font-weight: 700;
+}

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Traded_Cannot_Rename</fullName>
+    <active>true</active>
+    <errorConditionFormula>ISCHANGED(Nickname__c) &amp;&amp; PRIORVALUE(Is_Traded__c)</errorConditionFormula>
+    <errorMessage>A traded Pokemon cannot be renamed.</errorMessage>
+</ValidationRule>

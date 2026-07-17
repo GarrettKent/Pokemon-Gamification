@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Cannot_Be_Own_Rival</fullName>
+    <active>true</active>
+    <errorConditionFormula>NOT(ISBLANK(Rival__c)) &amp;&amp; Rival__c = Id</errorConditionFormula>
+    <errorDisplayField>Rival__c</errorDisplayField>
+    <errorMessage>A Trainer cannot be their own rival.</errorMessage>
+</ValidationRule>

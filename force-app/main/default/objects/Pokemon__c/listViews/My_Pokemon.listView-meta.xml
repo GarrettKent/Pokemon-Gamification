@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>My_Pokemon</fullName>
+    <columns>Sprite__c</columns>
+    <columns>NAME</columns>
+    <columns>Nickname__c</columns>
+    <columns>Level__c</columns>
+    <columns>Type__c</columns>
+    <columns>Type_2__c</columns>
+    <columns>Is_Shiny__c</columns>
+    <columns>Can_Evolve__c</columns>
+    <columns>Pokemon_Trainer__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>My Pokemon</label>
+</ListView>

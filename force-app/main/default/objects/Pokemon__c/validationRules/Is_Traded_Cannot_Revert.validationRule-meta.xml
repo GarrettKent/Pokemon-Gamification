@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Is_Traded_Cannot_Revert</fullName>
+    <active>true</active>
+    <errorConditionFormula>ISCHANGED(Is_Traded__c) &amp;&amp; PRIORVALUE(Is_Traded__c) &amp;&amp; NOT(Is_Traded__c)</errorConditionFormula>
+    <errorMessage>A traded Pokemon cannot be marked as not traded.</errorMessage>
+</ValidationRule>

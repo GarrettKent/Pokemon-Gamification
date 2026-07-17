@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EXP_Cannot_Be_Negative</fullName>
+    <active>true</active>
+    <errorConditionFormula>(ISNEW() || ISCHANGED(EXP_Points__c)) &amp;&amp; (ISBLANK(EXP_Points__c) || EXP_Points__c &lt; 0)</errorConditionFormula>
+    <errorDisplayField>EXP_Points__c</errorDisplayField>
+    <errorMessage>A Pokemon must have EXP of zero or greater.</errorMessage>
+</ValidationRule>

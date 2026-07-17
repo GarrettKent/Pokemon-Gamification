@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Catch_Rate_Multiplier__c</fullName>
+    <description>Multiplies the computed catch probability (capped at 100%). 1 = the base formula; 1.5 = friendly pilot odds. Tune here without a deploy.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Catch Rate Multiplier</label>
+    <precision>4</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

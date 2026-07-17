@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Species_Cannot_Change</fullName>
+    <active>true</active>
+    <errorConditionFormula>ISCHANGED(Pokedex_Number__c) || ISCHANGED(Species_Name__c)</errorConditionFormula>
+    <errorDisplayField>Species_Name__c</errorDisplayField>
+    <errorMessage>A Pokemon's species cannot change — evolution creates a new Pokemon.</errorMessage>
+</ValidationRule>

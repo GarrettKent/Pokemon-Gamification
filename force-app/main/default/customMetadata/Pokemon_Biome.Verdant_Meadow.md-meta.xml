@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Verdant Meadow</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Grass_Patch_Count__c</field>
+        <value xsi:type="xsd:double">4</value>
+    </values>
+    <values>
+        <field>Background_Image_Url__c</field>
+        <value xsi:type="xsd:string"></value>
+    </values>
+    <values>
+        <field>Encounters_Json__c</field>
+        <value xsi:type="xsd:string">[{"dex":10,"tier":"common"},{"dex":13,"tier":"common"},{"dex":16,"tier":"common"},{"dex":19,"tier":"common"},{"dex":21,"tier":"common"},{"dex":41,"tier":"common"},{"dex":43,"tier":"common"},{"dex":52,"tier":"common"},{"dex":69,"tier":"common"},{"dex":161,"tier":"common"},{"dex":163,"tier":"common"},{"dex":165,"tier":"common"},{"dex":167,"tier":"common"},{"dex":187,"tier":"common"},{"dex":263,"tier":"common"},{"dex":265,"tier":"common"},{"dex":270,"tier":"common"},{"dex":273,"tier":"common"},{"dex":285,"tier":"common"},{"dex":287,"tier":"common"},{"dex":290,"tier":"common"},{"dex":300,"tier":"common"},{"dex":327,"tier":"common"},{"dex":333,"tier":"common"},{"dex":396,"tier":"common"},{"dex":399,"tier":"common"},{"dex":401,"tier":"common"},{"dex":406,"tier":"common"},{"dex":191,"tier":"common"},{"dex":276,"tier":"common"},{"dex":283,"tier":"common"},{"dex":352,"tier":"common"},{"dex":357,"tier":"common"},{"dex":455,"tier":"common"},{"dex":46,"tier":"common"},{"dex":48,"tier":"common"},{"dex":84,"tier":"common"},{"dex":177,"tier":"common"},{"dex":204,"tier":"common"},{"dex":206,"tier":"common"},{"dex":213,"tier":"common"},{"dex":278,"tier":"common"},{"dex":293,"tier":"common"},{"dex":331,"tier":"common"},{"dex":420,"tier":"common"},{"dex":427,"tier":"common"},{"dex":431,"tier":"common"},{"dex":39,"tier":"common"},{"dex":174,"tier":"common"},{"dex":298,"tier":"common"},{"dex":22,"tier":"uncommon"},{"dex":42,"tier":"uncommon"},{"dex":53,"tier":"uncommon"},{"dex":102,"tier":"uncommon"},{"dex":162,"tier":"uncommon"},{"dex":164,"tier":"uncommon"},{"dex":166,"tier":"uncommon"},{"dex":168,"tier":"uncommon"},{"dex":169,"tier":"uncommon"},{"dex":264,"tier":"uncommon"},{"dex":286,"tier":"uncommon"},{"dex":335,"tier":"uncommon"},{"dex":47,"tier":"uncommon"},{"dex":49,"tier":"uncommon"},{"dex":176,"tier":"uncommon"},{"dex":178,"tier":"uncommon"},{"dex":193,"tier":"uncommon"},{"dex":205,"tier":"uncommon"},{"dex":284,"tier":"uncommon"},{"dex":407,"tier":"uncommon"},{"dex":421,"tier":"uncommon"},{"dex":432,"tier":"uncommon"},{"dex":203,"tier":"uncommon"},{"dex":207,"tier":"uncommon"},{"dex":217,"tier":"uncommon"},{"dex":143,"tier":"rare"},{"dex":212,"tier":"rare"},{"dex":226,"tier":"rare"},{"dex":227,"tier":"rare"},{"dex":458,"tier":"rare"}]</value>
+    </values>
+</CustomMetadata>

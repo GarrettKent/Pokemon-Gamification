@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Level_Must_Be_1_To_100</fullName>
+    <active>true</active>
+    <errorConditionFormula>(ISNEW() || ISCHANGED(Level__c)) &amp;&amp; (ISBLANK(Level__c) || Level__c &lt; 1 || Level__c &gt; 100)</errorConditionFormula>
+    <errorDisplayField>Level__c</errorDisplayField>
+    <errorMessage>A Pokemon's level must be between 1 and 100.</errorMessage>
+</ValidationRule>
