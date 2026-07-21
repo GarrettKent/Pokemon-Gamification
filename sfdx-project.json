@@ -4,8 +4,8 @@
       "path": "force-app",
       "default": true,
       "package": "LSC - Poke",
-      "versionName": "ver 0.1",
-      "versionNumber": "0.1.0.NEXT",
+      "versionName": "ver 0.1.1",
+      "versionNumber": "0.1.1.NEXT",
       "versionDescription": "Pokemon gamification layer for LSC — unlocked, unprefixed package",
       "definitionFile": "config/project-scratch-def.json"
     }
@@ -17,6 +17,7 @@
   "packageAliases": {
     "LSC - Poke": "0HoHs000000L2DcKAK",
     "LSC - Poke@0.1.0-1": "04tHs000000iTAKIA2",
-    "LSC - Poke@0.1.0-2": "04tHs000000iTAUIA2"
+    "LSC - Poke@0.1.0-2": "04tHs000000iTAUIA2",
+    "LSC - Poke@0.1.1-1": "04tHs000000iTAjIAM"
   }
 }
