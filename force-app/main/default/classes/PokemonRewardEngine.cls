@@ -12,6 +12,8 @@
  *           instead of silently zeroing every rule's payout for the transaction; helpers renamed to PascalCase
  * Modified: Garrett Kent - 07/06/2026 - Governor pre-flight before the trainer SOQL and UPDATE: LimitException is
  *           uncatchable, so the engine yields silently when the subscriber's transaction has no headroom left
+ * Modified: Garrett Kent - 07/20/2026 - Test insulation: trigger-invoked runs no-op in test context unless a test
+ *           opts in via allowTriggerRunsInTests, so subscriber test DML never pays or spends limits
  */
 public without sharing class PokemonRewardEngine {
 
@@ -30,11 +32,15 @@ public without sharing class PokemonRewardEngine {
     @TestVisible static List<Pokemon_Reward_Rule__mdt> ruleOverride;
     @TestVisible static Boolean automationEnabledOverride;
     @TestVisible static Decimal dailyCapOverride;
+    @TestVisible static Boolean allowTriggerRunsInTests = false;
 
     public static void run(List<SObject> newRecords, Map<Id, SObject> oldMap, TriggerOperation op){
         try{
             if(newRecords == null || newRecords.isEmpty()) return;
             if(op != TriggerOperation.AFTER_INSERT && op != TriggerOperation.AFTER_UPDATE) return;
+            // Subscriber tests fire the hooked triggers on every test DML; those runs stay no-ops
+            // unless a test opts in, so test setup never pays and never spends the test's limits.
+            if(Test.isRunningTest() && Trigger.isExecuting && !allowTriggerRunsInTests) return;
             if(!AutomationEnabled()) return;
             if(isAwarding) return;
             isAwarding = true;
