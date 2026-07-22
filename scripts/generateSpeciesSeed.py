@@ -4,9 +4,10 @@
 # Purpose: One-time / regenerable build-time generator for pokemonSpeciesSeed.json.
 #          Pulls /pokemon/{id} + /pokemon-species/{id} + the species evolution chain from PokeAPI
 #          for a dex range, trims to the doc-01 seed shape, normalizes growthRate to the canonical 6,
-#          captures level-up evolution (evolveLevel + evolvesToDex) and stone/use-item evolution
-#          (stoneEvolutions: {item -> evolvesToDex}), validates every entry, and writes
-#          the seed + an anomaly report. Values come from PokeAPI, never authored by hand. Honors fair-use (local cache).
+#          captures level-up evolution (evolveLevel + evolvesToDex), stone/use-item evolution
+#          (stoneEvolutions: {item -> evolvesToDex}), and friendship evolution (evolvesByFriendship),
+#          validates every entry, and writes the seed + an anomaly report.
+#          Values come from PokeAPI, never authored by hand. Honors fair-use (local cache).
 # Usage:   python3 generateSpeciesSeed.py [START] [END]   (defaults 1 493 = Gen 1-4)
 
 import json, os, subprocess, sys, time
@@ -113,6 +114,17 @@ def use_item_evolutions(node):
     return stoneEvolutions
 
 
+def evolves_by_friendship(node):
+    # True when this species evolves by high friendship: PokeAPI models these as a level-up trigger
+    # carrying min_happiness (and no fixed min_level). Covers the Gen 1-4 friendship line
+    # (Golbat -> Crobat, Chansey -> Blissey, the baby Pokemon, Eevee -> Espeon/Umbreon, ...).
+    for child in node.get("evolves_to", []):
+        for detail in child.get("evolution_details", []):
+            if detail.get("trigger", {}).get("name") == "level-up" and detail.get("min_happiness"):
+                return True
+    return False
+
+
 def build():
     errors = []
     with ThreadPoolExecutor(max_workers=WORKERS) as ex:
@@ -133,6 +145,7 @@ def build():
     anomalies = []
     evolvers = 0
     stone_evolvers = 0
+    friendship_evolvers = 0
     for i in range(START, END + 1):
         with open("%s/pokemon_%d.json" % (CACHE, i)) as fh:
             pk = json.load(fh)
@@ -186,6 +199,9 @@ def build():
                     if stone_evos:
                         entry["stoneEvolutions"] = stone_evos
                         stone_evolvers += 1
+                    if evolves_by_friendship(node):
+                        entry["evolvesByFriendship"] = True
+                        friendship_evolvers += 1
 
         entry["image"] = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/%d.png" % i
 
@@ -221,6 +237,7 @@ def build():
         fh.write("Species seed report (#%d-%d), %d entries\n" % (START, END, len(ordered)))
         fh.write("Level-up evolvers flagged: %d\n" % evolvers)
         fh.write("Stone (use-item) evolvers flagged: %d\n" % stone_evolvers)
+        fh.write("Friendship evolvers flagged: %d\n" % friendship_evolvers)
         fh.write("Anomalies / items to confirm: %d\n" % len(anomalies))
         for a in anomalies:
             fh.write("  - %s\n" % a)
@@ -229,6 +246,7 @@ def build():
     print("WROTE %s (%d entries, %d bytes)" % (OUT, len(ordered), size))
     print("LEVEL-UP EVOLVERS: %d" % evolvers)
     print("STONE EVOLVERS: %d" % stone_evolvers)
+    print("FRIENDSHIP EVOLVERS: %d" % friendship_evolvers)
     print("ANOMALIES: %d (see %s)" % (len(anomalies), REPORT))
     for a in anomalies:
         print("  - %s" % a)

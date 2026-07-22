@@ -5,6 +5,7 @@
  *          is reserved for the Poke Ball accents only.
  * Modified: Garrett Kent - 06/22/2026 - Equal-height roster grid (CSS grid, stretch), readable borderless pagination footer, page-size combobox auto alignment.
  * Modified: Garrett Kent - 07/05/2026 - Added Play Pokemon Jazz link (media chip) to the trainer card header.
+ * Modified: Garrett Kent - 07/21/2026 - Clickable trainer name (record link) and inline rival editor row.
  */
 
 /* ---- Trainer ID Card ---- */
@@ -67,10 +68,39 @@
     text-overflow: ellipsis;
 }
 
+/* Trainer name as a record link: inherits the heading look, only the underline hints it is clickable */
+.trainer-card__name-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.trainer-card__name-link:hover,
+.trainer-card__name-link:focus-visible {
+    text-decoration: underline;
+    text-decoration-color: #ee1515;
+    text-underline-offset: 0.125rem;
+}
+
+/* Rival row: label/editor sits inline with a small edit affordance, always visible so a rival can be set or changed */
+.trainer-card__rival-row {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.125rem;
+}
+
 .trainer-card__rival {
     font-size: 0.8125rem;
     color: #8a8a96;
-    margin-top: 0.125rem;
+}
+
+.trainer-card__rival-combo {
+    min-width: 11rem;
+}
+
+.trainer-card__rival-action {
+    --slds-c-button-text-color: #8a8a96;
+    --slds-c-button-text-color-hover: #ee1515;
 }
 
 /* ---- Pokemon Jazz link (media chip) ---- */
