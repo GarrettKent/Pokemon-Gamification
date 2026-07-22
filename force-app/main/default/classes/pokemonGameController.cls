@@ -9,6 +9,7 @@
  * Modified: Garrett Kent - 07/05/2026 - Encrypted encounter tokens: patches hide species/level/shiny from the browser, RevealEncounter opens them, CatchPokemon consumes them; minimum wild levels; shiny rolled at patch time; friendly catch-rate multiplier
  * Modified: Garrett Kent - 07/05/2026 - Single-use tokens: a caught or fled encounter is ledgered on the trainer so a captured token cannot be replayed to farm shinies; broke-free stays throwable
  * Modified: Garrett Kent - 07/21/2026 - Added SetRival so a trainer can change (or clear) their rival from the Trainer Hub
+ * Modified: Garrett Kent - 07/22/2026 - Mart-only balls: 10 starter Poke Balls, Master Ball milestone grant commented out, trainer ball guard opened around game DML
  */
 public with sharing class pokemonGameController {
 
@@ -44,6 +45,7 @@ public with sharing class pokemonGameController {
             Integer starterLevel = pokemonGameHelper.RandomCatchLevel(config);
             Boolean starterIsShiny = pokemonCatchLogic.RollShiny(pokemonGameHelper.ShinyRate(config));
 
+            pokemonTrainerOrgHelper.allowBallChanges = true;
             Savepoint savePoint = Database.setSavepoint();
             try{
                 INSERT trainer;
@@ -55,6 +57,9 @@ public with sharing class pokemonGameController {
             catch(Exception dmlError){
                 Database.rollback(savePoint);
                 throw dmlError;
+            }
+            finally{
+                pokemonTrainerOrgHelper.allowBallChanges = false;
             }
         }
         catch(Exception error){
@@ -172,17 +177,19 @@ public with sharing class pokemonGameController {
             Boolean caughtShiny = caught && isShiny;
             Boolean criticalCapture = false;
             Pokemon__c caughtPokemon = null;
-            Integer masterBallsGranted = 0;
+            // Master Ball milestone grant disabled 07/22/2026 (Master Balls are unobtainable; the trainer trigger guard also blocks any increase):
+            // Integer masterBallsGranted = 0;
             if(caught){
                 criticalCapture = criticalCaptureOverride != null ? criticalCaptureOverride : pokemonCatchLogic.RollCriticalCapture(pokemonGameHelper.CriticalCaptureRate(config));
                 caughtPokemon = pokemonGameHelper.BuildPokemon(species, pokedexNumber, level, isShiny, trainer.Id);
-                masterBallsGranted = MasterBallsForMilestone(trainer, pokedexNumber, config);
-                if(masterBallsGranted > 0) trainer.Master_Balls__c = pokemonGameHelper.ClampToZero(trainer.Master_Balls__c) + masterBallsGranted;
+                // masterBallsGranted = MasterBallsForMilestone(trainer, pokedexNumber, config);
+                // if(masterBallsGranted > 0) trainer.Master_Balls__c = pokemonGameHelper.ClampToZero(trainer.Master_Balls__c) + masterBallsGranted;
             }
 
             // Caught or fled spends the encounter; broke-free leaves it live so the trainer can throw again.
             if(caught || fled) pokemonGameHelper.MarkEncounterConsumed(trainer, tokenHash);
 
+            pokemonTrainerOrgHelper.allowBallChanges = true;
             Savepoint savePoint = Database.setSavepoint();
             try{
                 UPDATE trainer;
@@ -195,6 +202,9 @@ public with sharing class pokemonGameController {
                 Database.rollback(savePoint);
                 throw dmlError;
             }
+            finally{
+                pokemonTrainerOrgHelper.allowBallChanges = false;
+            }
 
             Pokemon_Trainer__c refreshedTrainer = pokemonGameHelper.RequeryTrainer(trainer.Id);
             results.put('caught', caught);
@@ -204,7 +214,7 @@ public with sharing class pokemonGameController {
             results.put('criticalCapture', criticalCapture);
             results.put('probability', catchProbability);
             results.put('ballCounts', pokemonGameHelper.BallCounts(refreshedTrainer));
-            results.put('masterBallsGranted', masterBallsGranted);
+            // results.put('masterBallsGranted', masterBallsGranted);
             results.put('message', caught ? 'Gotcha! Pokemon caught.' : (fled ? 'Oh no! The Pokemon fled!' : 'The Pokemon broke free!'));
         }
         catch(Exception error){
@@ -300,6 +310,7 @@ public with sharing class pokemonGameController {
                 trainer.put(itemField, currentCount + cart.get(itemType));
             }
 
+            pokemonTrainerOrgHelper.allowBallChanges = true;
             Savepoint savePoint = Database.setSavepoint();
             try{
                 UPDATE trainer;
@@ -307,6 +318,9 @@ public with sharing class pokemonGameController {
             catch(Exception dmlError){
                 Database.rollback(savePoint);
                 throw dmlError;
+            }
+            finally{
+                pokemonTrainerOrgHelper.allowBallChanges = false;
             }
 
             results.put('trainer', pokemonGameHelper.RequeryTrainer(trainer.Id));
@@ -662,7 +676,7 @@ public with sharing class pokemonGameController {
         return new Pokemon_Trainer__c(
             Name = String.isBlank(requestedName) ? UserInfo.getName() : requestedName.trim(),
             Currency__c = 500,
-            Poke_Balls__c = 5,
+            Poke_Balls__c = 10,
             Great_Balls__c = 0,
             Ultra_Balls__c = 0,
             Master_Balls__c = 0,
@@ -672,13 +686,15 @@ public with sharing class pokemonGameController {
         );
     }
 
-    static Integer MasterBallsForMilestone(Pokemon_Trainer__c trainer, Integer pokedexNumber, Pokemon_Settings__mdt config){
-        Set<Integer> ownedSpecies = pokemonGameHelper.OwnedSpeciesNumbers(trainer.Id);
-        Integer milestone = pokemonGameHelper.MasterBallMilestone(config);
-        Integer beforeUnique = ownedSpecies.size();
-        Integer afterUnique = beforeUnique + (ownedSpecies.contains(pokedexNumber) ? 0 : 1);
-        return (afterUnique / milestone) - (beforeUnique / milestone);
-    }
+    // Master Ball milestone grant disabled 07/22/2026 — to re-enable, restore this with the commented CatchPokemon lines,
+    // the pokemonGameHelper accessors, and relax the Master Ball block in pokemonTrainerOrgHelper.GuardBallFields.
+    // static Integer MasterBallsForMilestone(Pokemon_Trainer__c trainer, Integer pokedexNumber, Pokemon_Settings__mdt config){
+    //     Set<Integer> ownedSpecies = pokemonGameHelper.OwnedSpeciesNumbers(trainer.Id);
+    //     Integer milestone = pokemonGameHelper.MasterBallMilestone(config);
+    //     Integer beforeUnique = ownedSpecies.size();
+    //     Integer afterUnique = beforeUnique + (ownedSpecies.contains(pokedexNumber) ? 0 : 1);
+    //     return (afterUnique / milestone) - (beforeUnique / milestone);
+    // }
 
     static Pokemon__c LoadOwnedPokemon(Map<String,Object> results, String methodName, Id pokemonId){
         Pokemon__c pokemon = pokemonGameHelper.FetchPokemon(pokemonId);

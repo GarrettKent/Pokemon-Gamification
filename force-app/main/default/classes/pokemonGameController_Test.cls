@@ -6,6 +6,7 @@
  * Modified: Garrett Kent - 06/22/2026 - Added Shiny/Dusk/Dawn evolution stones
  * Modified: Garrett Kent - 07/05/2026 - Encounter tokens: catches mint/decode encrypted tokens, RevealEncounter coverage, minimum-wild-level floors, anti-inspect patch payload
  * Modified: Garrett Kent - 07/21/2026 - SetRival coverage (set/clear/ineligible/no-trainer) and Can_Evolve for stone + friendship evolvers
+ * Modified: Garrett Kent - 07/22/2026 - Mart-only balls: starter grant is 10, milestone grant disabled, ball-guard wiring coverage (opt-in enforcement)
  */
 @isTest
 private class pokemonGameController_Test {
@@ -66,7 +67,7 @@ private class pokemonGameController_Test {
         System.assertEquals('success', results.get('status'), 'CreateTrainer should succeed');
         Pokemon_Trainer__c trainer = (Pokemon_Trainer__c)results.get('trainer');
         System.assertEquals(500, trainer.Currency__c, 'Starting currency should be 500');
-        System.assertEquals(5, trainer.Poke_Balls__c, 'Starting Poke Balls should be 5');
+        System.assertEquals(10, trainer.Poke_Balls__c, 'Starting Poke Balls should be 10');
         System.assertEquals('Ash', trainer.Name, 'Trainer name should be set');
 
         Pokemon__c starter = (Pokemon__c)results.get('starter');
@@ -198,7 +199,7 @@ private class pokemonGameController_Test {
         System.assertEquals(false, results.get('fled'), 'With a 0% flee chance the Pokemon breaks free but stays');
         System.assertEquals(null, results.get('pokemon'), 'No Pokemon is created on a miss');
         Map<String,Object> ballCounts = (Map<String,Object>)results.get('ballCounts');
-        System.assertEquals(4, (Decimal)ballCounts.get('pokeball'), 'A thrown Poke Ball is consumed even when the catch fails (5 -> 4)');
+        System.assertEquals(9, (Decimal)ballCounts.get('pokeball'), 'A thrown Poke Ball is consumed even when the catch fails (10 -> 9)');
     }
 
     @isTest static void testCatchFleeEndsTheEncounter(){
@@ -218,7 +219,7 @@ private class pokemonGameController_Test {
         System.assertEquals(true, results.get('fled'), 'With a 100% flee chance the Pokemon flees');
         System.assertEquals(null, results.get('pokemon'), 'No Pokemon is created when it flees');
         Map<String,Object> ballCounts = (Map<String,Object>)results.get('ballCounts');
-        System.assertEquals(4, (Decimal)ballCounts.get('pokeball'), 'The thrown ball is still consumed on a flee (5 -> 4)');
+        System.assertEquals(9, (Decimal)ballCounts.get('pokeball'), 'The thrown ball is still consumed on a flee (10 -> 9)');
     }
 
     @isTest static void testCatchSuccessNeverFlees(){
@@ -265,7 +266,7 @@ private class pokemonGameController_Test {
         System.assertEquals('error', results.get('status'), 'Invalid ball type should error');
     }
 
-    @isTest static void testCatchMasterBallMilestone(){
+    @isTest static void testCatchMasterBallMilestoneDisabled(){
         Pokemon_Trainer__c trainer = CreateTrainerAsCurrentUser('Ash', 1);
 
         // Starter is dex 1 — add 8 more distinct species to reach 9 distinct on the roster.
@@ -287,7 +288,7 @@ private class pokemonGameController_Test {
         trainer.Master_Balls__c = 1;
         UPDATE trainer;
 
-        // Catch a 10th NEW species (dex 63 Abra) via master ball — crosses the 10-species milestone.
+        // Catch a 10th NEW species (dex 63 Abra) via master ball — crosses what used to be the 10-species milestone.
         Test.startTest();
         Map<String,Object> results = pokemonGameController.CatchPokemon(new Map<String,Object>{
             'token' => pokemonGameHelper.EncounterToken(63, 5, false),
@@ -297,11 +298,64 @@ private class pokemonGameController_Test {
 
         System.assertEquals('success', results.get('status'), 'Milestone catch should succeed');
         System.assertEquals(true, results.get('caught'), 'Master ball should catch the 10th species');
-        System.assertEquals(1, (Integer)results.get('masterBallsGranted'), 'Crossing the 10-species milestone grants one master ball');
+        System.assertEquals(null, results.get('masterBallsGranted'), 'The milestone grant is disabled — no master balls are granted');
 
         Pokemon_Trainer__c refreshed = [SELECT Master_Balls__c FROM Pokemon_Trainer__c WHERE Id = :trainer.Id];
-        // Started with 1, spent 1 to catch, granted 1 back at the boundary.
-        System.assertEquals(1, refreshed.Master_Balls__c, 'Master ball balance reflects spend plus milestone grant');
+        // Started with 1, spent 1 to catch, nothing granted back — Master Balls are unobtainable.
+        System.assertEquals(0, refreshed.Master_Balls__c, 'Master ball balance reflects the spend with no milestone grant');
+    }
+
+    // ---- Trainer ball guard wiring (mart-only balls) ----
+
+    @isTest static void testBallGuardAllowsGameGrants(){
+        pokemonTrainerOrgHelper.enforceBallGuardInTests = true;
+        try{
+            Test.startTest();
+            Map<String,Object> createResults = pokemonGameController.CreateTrainer(new Map<String,Object>{
+                'trainerName' => 'Ash',
+                'starterPokedexId' => 25
+            });
+            Map<String,Object> purchaseResults = pokemonGameController.PurchaseItems(new Map<String,Object>{
+                'cart' => new Map<String,Object>{ 'pokeball' => 2 }
+            });
+            Test.stopTest();
+
+            System.assertEquals('success', createResults.get('status'), 'CreateTrainer should succeed with the ball guard enforced');
+            Pokemon_Trainer__c trainer = (Pokemon_Trainer__c)createResults.get('trainer');
+            System.assertEquals(10, trainer.Poke_Balls__c, 'The starter grant passes the guard because CreateTrainer flags its insert as game DML');
+            System.assertEquals(0, trainer.Master_Balls__c, 'Master Balls are zero on insert');
+
+            System.assertEquals('success', purchaseResults.get('status'), 'Purchase should succeed with the ball guard enforced');
+            Pokemon_Trainer__c updated = (Pokemon_Trainer__c)purchaseResults.get('trainer');
+            System.assertEquals(12, updated.Poke_Balls__c, 'The purchase passes the guard because PurchaseItems flags its update as game DML');
+        }
+        finally{
+            pokemonTrainerOrgHelper.enforceBallGuardInTests = false;
+        }
+    }
+
+    @isTest static void testBallGuardAllowsThrowDecrement(){
+        Pokemon_Trainer__c trainer = CreateTrainerAsCurrentUser('Ash', 1);
+        trainer.Master_Balls__c = 1;
+        UPDATE trainer;
+
+        pokemonTrainerOrgHelper.enforceBallGuardInTests = true;
+        try{
+            Test.startTest();
+            Map<String,Object> results = pokemonGameController.CatchAttempt(new Map<String,Object>{
+                'token' => pokemonGameHelper.EncounterToken(4, 5, false),
+                'ballType' => 'masterball'
+            });
+            Test.stopTest();
+
+            System.assertEquals('success', results.get('status'), 'Catch should succeed with the ball guard enforced');
+            System.assertEquals(true, results.get('caught'), 'Master ball always catches');
+            Map<String,Object> ballCounts = (Map<String,Object>)results.get('ballCounts');
+            System.assertEquals(0, (Decimal)ballCounts.get('masterball'), 'The throw decrement passes the guard — spending is allowed, gaining is not');
+        }
+        finally{
+            pokemonTrainerOrgHelper.enforceBallGuardInTests = false;
+        }
     }
 
     @isTest static void testPowerUpSuccess(){
@@ -382,7 +436,7 @@ private class pokemonGameController_Test {
 
         System.assertEquals('success', results.get('status'), 'Purchase should succeed');
         Pokemon_Trainer__c updated = (Pokemon_Trainer__c)results.get('trainer');
-        System.assertEquals(7, updated.Poke_Balls__c, 'Two Poke Balls should be added to the starting 5');
+        System.assertEquals(12, updated.Poke_Balls__c, 'Two Poke Balls should be added to the starting 10');
         System.assertEquals(100, updated.Currency__c, 'Currency should be debited by 400 (2 x 200)');
     }
 
@@ -398,7 +452,7 @@ private class pokemonGameController_Test {
 
         System.assertEquals('success', results.get('status'), 'Cart marshalled as Map<Object,Object> should purchase: ' + results.get('message'));
         Pokemon_Trainer__c updated = (Pokemon_Trainer__c)results.get('trainer');
-        System.assertEquals(6, updated.Poke_Balls__c, 'One Poke Ball should be added to the starting 5');
+        System.assertEquals(11, updated.Poke_Balls__c, 'One Poke Ball should be added to the starting 10');
     }
 
     @isTest static void testPurchaseItemsInsufficientCurrency(){
@@ -1836,7 +1890,7 @@ private class pokemonGameController_Test {
             });
             System.assertEquals('success', purchaseResults.get('status'), 'Spend should succeed under least privilege');
             Pokemon_Trainer__c updated = (Pokemon_Trainer__c)purchaseResults.get('trainer');
-            System.assertEquals(6, updated.Poke_Balls__c, 'Purchased ball should land under least privilege');
+            System.assertEquals(11, updated.Poke_Balls__c, 'Purchased ball should land under least privilege');
         }
         Test.stopTest();
     }

@@ -10,6 +10,7 @@
  * Modified: Garrett Kent - 07/05/2026 - Encrypted encounter tokens (anti-inspect grass), minimum wild levels for evolved/legendary species, shiny rolled at patch time, catch-rate multiplier
  * Modified: Garrett Kent - 07/05/2026 - Single-use tokens: consumed (caught/fled) encounter hashes ledgered on the trainer so a captured shiny token cannot be replayed
  * Modified: Garrett Kent - 07/21/2026 - Can_Evolve__c stamped true for stone and friendship evolvers, not just level-up
+ * Modified: Garrett Kent - 07/22/2026 - Commented out the Master Ball dex-milestone accessors (Master Balls are no longer obtainable)
  */
 public with sharing class pokemonGameHelper {
 
@@ -137,13 +138,14 @@ public with sharing class pokemonGameHelper {
         ];
     }
 
-    public static Set<Integer> OwnedSpeciesNumbers(Id trainerId){
-        Set<Integer> pokedexNumbers = new Set<Integer>();
-        for(Pokemon__c owned : [SELECT Pokedex_Number__c FROM Pokemon__c WHERE Pokemon_Trainer__c = :trainerId]){
-            if(owned.Pokedex_Number__c != null) pokedexNumbers.add((Integer)owned.Pokedex_Number__c);
-        }
-        return pokedexNumbers;
-    }
+    // Master Ball milestone support disabled 07/22/2026 — only MasterBallsForMilestone used this:
+    // public static Set<Integer> OwnedSpeciesNumbers(Id trainerId){
+    //     Set<Integer> pokedexNumbers = new Set<Integer>();
+    //     for(Pokemon__c owned : [SELECT Pokedex_Number__c FROM Pokemon__c WHERE Pokemon_Trainer__c = :trainerId]){
+    //         if(owned.Pokedex_Number__c != null) pokedexNumbers.add((Integer)owned.Pokedex_Number__c);
+    //     }
+    //     return pokedexNumbers;
+    // }
 
     // ---- Rival ----
 
@@ -518,9 +520,10 @@ public with sharing class pokemonGameHelper {
         return config != null && config.Flee_Chance_Common__c != null ? config.Flee_Chance_Common__c : 10;
     }
 
-    public static Integer MasterBallMilestone(Pokemon_Settings__mdt config){
-        return config.Master_Ball_Dex_Milestone__c == null ? 10 : config.Master_Ball_Dex_Milestone__c.intValue();
-    }
+    // Master Ball milestone support disabled 07/22/2026 (Master_Ball_Dex_Milestone__c stays on the CMDT, dormant):
+    // public static Integer MasterBallMilestone(Pokemon_Settings__mdt config){
+    //     return config.Master_Ball_Dex_Milestone__c == null ? 10 : config.Master_Ball_Dex_Milestone__c.intValue();
+    // }
 
     // ---- Clamp ----
 

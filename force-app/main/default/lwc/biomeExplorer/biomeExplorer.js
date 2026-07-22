@@ -2,6 +2,7 @@
  * Created By: Garrett Kent - 06/20/2026
  * Purpose: Biome exploration screen — the trainer picks a biome, the server returns tall-grass patches, and clicking a patch opens the wild encounter modal. Re-fetches the trainer after each outcome and bubbles balance changes to the dashboard.
  * Modified: Garrett Kent - 07/05/2026 - Patches now carry only an encrypted token + shiny flag; clicking grass reveals the encounter server-side, and the golden glow marks shiny (not rare) patches
+ * Modified: Garrett Kent - 07/22/2026 - Pre-rolled biomes: all six biomes roll once at load and are cached, so switching between biomes never re-rolls the grass — only a page refresh does
  */
 import { LightningElement, track } from 'lwc';
 import { ShowToast, ShowError, CheckBlank, isSuccess } from 'c/pokemonBasics';
@@ -22,6 +23,7 @@ export default class BiomeExplorer extends LightningElement {
         ballCounts: { pokeball: 0, greatball: 0, ultraball: 0, masterball: 0 },
         selectedBiome: '',
         biomeTiles: [],
+        biomeData: {},
         patches: [],
         hasPatches: false,
         displayPatches: [],
@@ -33,6 +35,7 @@ export default class BiomeExplorer extends LightningElement {
     };
     loading = false;
     debug = false;
+    _biomeRequests = {};
 
     biomes = [
         { value: 'Verdant_Meadow', label: 'Verdant Meadow' },
@@ -111,6 +114,7 @@ export default class BiomeExplorer extends LightningElement {
                 ballCounts: this.buildBallCounts(trainer),
                 ballPouch: this.buildBallPouch(trainer)
             };
+            if(this.clientObj.hasTrainer) this.prefetchBiomes();
         }).catch(error => {
             if(this.debug) console.log(`loadTrainer error: ${JSON.stringify(error)}`);
             ShowError(error);
@@ -119,29 +123,55 @@ export default class BiomeExplorer extends LightningElement {
         });
     };
 
+    // Roll every biome once up front — what hides in the grass is decided at page load. A failed roll stays
+    // silent here (six error toasts would spam the load) and simply retries when the trainer clicks that biome.
+    prefetchBiomes = () => {
+        this.biomes.forEach(biome => this.fetchBiomePatches(biome.value).catch(() => {}));
+    };
+
+    // One roll per biome per page load: the first request (prefetch or click) creates the promise and every
+    // later request reuses it, so switching between biomes can never re-roll. Failures clear their slot to allow a retry.
+    fetchBiomePatches = (biome) => {
+        if(this._biomeRequests[biome]) return this._biomeRequests[biome];
+        this._biomeRequests[biome] = GetBiomePokemon({ params: { biome } }).then(result => {
+            if(result.status === 'error') throw new Error(result.message);
+            if(result.status === 'warning') ShowToast('Heads up', result.message, 'warning');
+            const entry = { patches: result.patches || [], backgroundImageUrl: result.backgroundImageUrl || '' };
+            this.clientObj = { ...this.clientObj, biomeData: { ...this.clientObj.biomeData, [biome]: entry } };
+            return entry;
+        }).catch(error => {
+            delete this._biomeRequests[biome];
+            throw error;
+        });
+        return this._biomeRequests[biome];
+    };
+
     selectBiome = (event) => {
         const biome = event.currentTarget.dataset.biome;
         if(CheckBlank(biome)) return;
+        this.clientObj = { ...this.clientObj, selectedBiome: biome, biomeTiles: this.buildBiomeTiles(biome) };
+        const cachedEntry = this.clientObj.biomeData[biome];
+        if(cachedEntry) return this.applyBiomeEntry(cachedEntry);
         this.loading = true;
-        GetBiomePokemon({ params: { biome } }).then(result => {
-            if(result.status === 'error') return ShowToast('ERROR', result.message, 'error');
-            if(result.status === 'warning') ShowToast('Heads up', result.message, 'warning');
-            const patches = result.patches || [];
-            this.clientObj = {
-                ...this.clientObj,
-                selectedBiome: biome,
-                biomeTiles: this.buildBiomeTiles(biome),
-                patches,
-                hasPatches: patches.length > 0,
-                displayPatches: this.buildDisplayPatches(patches),
-                backgroundImageUrl: result.backgroundImageUrl || ''
-            };
+        this.fetchBiomePatches(biome).then(entry => {
+            if(this.clientObj.selectedBiome === biome) this.applyBiomeEntry(entry);
         }).catch(error => {
             if(this.debug) console.log(`selectBiome error: ${JSON.stringify(error)}`);
             ShowError(error);
         }).finally(() => {
             this.loading = false;
         });
+    };
+
+    applyBiomeEntry = (entry) => {
+        const patches = entry.patches || [];
+        this.clientObj = {
+            ...this.clientObj,
+            patches,
+            hasPatches: patches.length > 0,
+            displayPatches: this.buildDisplayPatches(patches),
+            backgroundImageUrl: entry.backgroundImageUrl || ''
+        };
     };
 
     // The patch only holds an encrypted token — the server reveals what is hiding in the grass on click,
@@ -179,12 +209,13 @@ export default class BiomeExplorer extends LightningElement {
 
     handleCaught = (event) => {
         const isShiny = event.detail.isShiny;
-        const masterBallsGranted = event.detail.masterBallsGranted || 0;
+        // Master Ball milestone grant disabled 07/22/2026:
+        // const masterBallsGranted = event.detail.masterBallsGranted || 0;
         this.consumeActivePatch();
         const pokemonName = this.clientObj.encounter ? this.clientObj.encounter.name : 'Pokemon';
         if(isShiny) ShowToast('Gotcha!', `A shiny ${pokemonName} was caught! Incredible!`, 'success');
         else ShowToast('Gotcha!', `${pokemonName} was caught!`, 'success');
-        if(masterBallsGranted > 0) ShowToast('Bonus!', `You earned ${masterBallsGranted} Master Ball(s)!`, 'success');
+        // if(masterBallsGranted > 0) ShowToast('Bonus!', `You earned ${masterBallsGranted} Master Ball(s)!`, 'success');
         this.refreshAfterOutcome();
     };
 
@@ -211,9 +242,16 @@ export default class BiomeExplorer extends LightningElement {
         const patches = this.clientObj.patches.map((patch, index) =>
             index === activeIndex ? { ...patch, consumed: true } : patch
         );
+        // Write the consumed patch back into the biome cache too, so a searched patch stays searched when the trainer switches biomes and returns.
+        const selectedBiome = this.clientObj.selectedBiome;
+        const cachedEntry = this.clientObj.biomeData[selectedBiome];
+        const biomeData = cachedEntry
+            ? { ...this.clientObj.biomeData, [selectedBiome]: { ...cachedEntry, patches } }
+            : this.clientObj.biomeData;
         this.clientObj = {
             ...this.clientObj,
             patches,
+            biomeData,
             hasPatches: patches.length > 0,
             displayPatches: this.buildDisplayPatches(patches)
         };
