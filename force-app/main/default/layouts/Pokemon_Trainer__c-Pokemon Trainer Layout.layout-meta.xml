@@ -57,21 +57,21 @@
         <label>Balls</label>
         <layoutColumns>
             <layoutItems>
-                <behavior>Edit</behavior>
+                <behavior>Readonly</behavior>
                 <field>Poke_Balls__c</field>
             </layoutItems>
             <layoutItems>
-                <behavior>Edit</behavior>
+                <behavior>Readonly</behavior>
                 <field>Great_Balls__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
-                <behavior>Edit</behavior>
+                <behavior>Readonly</behavior>
                 <field>Ultra_Balls__c</field>
             </layoutItems>
             <layoutItems>
-                <behavior>Edit</behavior>
+                <behavior>Readonly</behavior>
                 <field>Master_Balls__c</field>
             </layoutItems>
         </layoutColumns>
