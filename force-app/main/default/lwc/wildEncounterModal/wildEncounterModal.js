@@ -5,6 +5,7 @@
  * Modified: Garrett Kent - 06/21/2026 - Capture juice: finite three-wobble (or one big Critical Capture wobble) driven off the server result, then a ball snap + Gotcha star-burst on a catch
  * Modified: Garrett Kent - 07/05/2026 - Throws send the encrypted encounter token instead of dex/level — the server already knows what is in the grass
  * Modified: Garrett Kent - 07/05/2026 - Battle-scene resize: bag rail replaces the footer ball buttons, the thrown ball takes the Pokemon's spot on the stage and wobbles (stars pop over the ball on a catch), and the footer throw spinner is gone
+ * Modified: Garrett Kent - 07/22/2026 - Dropped masterBallsGranted from the caught event (the dex-milestone grant is gone; Master Balls are no longer obtainable)
  */
 import { LightningElement, api, track } from 'lwc';
 import { ShowToast, ShowError, isSuccess } from 'c/pokemonBasics';
@@ -125,7 +126,9 @@ export default class WildEncounterModal extends LightningElement {
             this.loading = false;
             this.buildPhaseFlags('caught');
             this.clientObj = { ...this.clientObj, snapClass: 'pokemon-snap', showBurst: true };
-            this.dispatchEvent(new CustomEvent('caught', { detail: { pokemon: result.pokemon, ballCounts: result.ballCounts, isShiny: result.isShiny, masterBallsGranted: result.masterBallsGranted } }));
+            // Master Ball milestone grant disabled 07/22/2026 — masterBallsGranted dropped from the caught event:
+            // this.dispatchEvent(new CustomEvent('caught', { detail: { pokemon: result.pokemon, ballCounts: result.ballCounts, isShiny: result.isShiny, masterBallsGranted: result.masterBallsGranted } }));
+            this.dispatchEvent(new CustomEvent('caught', { detail: { pokemon: result.pokemon, ballCounts: result.ballCounts, isShiny: result.isShiny } }));
             return;
         }
         if(result.fled){
