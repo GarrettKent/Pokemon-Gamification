@@ -5,6 +5,7 @@
  * Modified: Garrett Kent - 06/22/2026 - Updated veteran/fresh biome-level bounds for lowered wild-encounter level offsets
  * Modified: Garrett Kent - 06/22/2026 - Added Shiny/Dusk/Dawn evolution stones
  * Modified: Garrett Kent - 07/05/2026 - Encounter tokens: catches mint/decode encrypted tokens, RevealEncounter coverage, minimum-wild-level floors, anti-inspect patch payload
+ * Modified: Garrett Kent - 07/21/2026 - SetRival coverage (set/clear/ineligible/no-trainer) and Can_Evolve for stone + friendship evolvers
  */
 @isTest
 private class pokemonGameController_Test {
@@ -616,6 +617,85 @@ private class pokemonGameController_Test {
         System.assertEquals('success', results.get('status'), 'CreateTrainer should still succeed when the rival is ineligible: ' + results.get('message'));
         Pokemon_Trainer__c trainer = (Pokemon_Trainer__c)results.get('trainer');
         System.assertEquals(null, trainer.Rival__c, 'A rival whose owner lacks Pokemon_Full_Access must be rejected on save');
+    }
+
+    @isTest static void testSetRivalSuccess(){
+        Id rivalTrainerId = CreateTrainerForOtherUser('Gary');
+        CreateTrainerAsCurrentUser('Ash', 25);
+
+        Test.startTest();
+        Map<String,Object> results = pokemonGameController.SetRival(new Map<String,Object>{ 'rivalTrainerId' => rivalTrainerId });
+        Test.stopTest();
+
+        System.assertEquals('success', results.get('status'), 'SetRival should succeed: ' + results.get('message'));
+        Pokemon_Trainer__c trainer = (Pokemon_Trainer__c)results.get('trainer');
+        System.assertEquals(rivalTrainerId, trainer.Rival__c, 'Rival should be wired to the chosen trainer');
+    }
+
+    @isTest static void testSetRivalClearsWithBlank(){
+        Id rivalTrainerId = CreateTrainerForOtherUser('Gary');
+        CreateTrainerAsCurrentUser('Ash', 25);
+        pokemonGameController.SetRival(new Map<String,Object>{ 'rivalTrainerId' => rivalTrainerId });
+
+        Test.startTest();
+        Map<String,Object> results = pokemonGameController.SetRival(new Map<String,Object>{ 'rivalTrainerId' => '' });
+        Test.stopTest();
+
+        System.assertEquals('success', results.get('status'), 'Clearing the rival should succeed');
+        Pokemon_Trainer__c trainer = (Pokemon_Trainer__c)results.get('trainer');
+        System.assertEquals(null, trainer.Rival__c, 'Selecting N/A (blank) should clear the rival');
+    }
+
+    @isTest static void testSetRivalIneligibleRejected(){
+        Id nonPermissionedTrainerId = CreateTrainerForNonPermissionedUser('Silph Grunt');
+        CreateTrainerAsCurrentUser('Ash', 25);
+
+        Test.startTest();
+        Map<String,Object> results = pokemonGameController.SetRival(new Map<String,Object>{ 'rivalTrainerId' => nonPermissionedTrainerId });
+        Test.stopTest();
+
+        System.assertEquals('success', results.get('status'), 'SetRival should still succeed even when the pick is ineligible');
+        Pokemon_Trainer__c trainer = (Pokemon_Trainer__c)results.get('trainer');
+        System.assertEquals(null, trainer.Rival__c, 'A rival whose owner lacks Pokemon_Full_Access must be rejected');
+    }
+
+    @isTest static void testSetRivalNoTrainerRejected(){
+        Id rivalTrainerId = CreateTrainerForOtherUser('Gary');
+
+        Test.startTest();
+        Map<String,Object> results = pokemonGameController.SetRival(new Map<String,Object>{ 'rivalTrainerId' => rivalTrainerId });
+        Test.stopTest();
+
+        System.assertEquals('error', results.get('status'), 'SetRival should reject when the current user has no trainer');
+    }
+
+    @isTest static void testCanEvolveStoneAndFriendship(){
+        Pokemon_Trainer__c trainer = CreateTrainerAsCurrentUser('Ash', 25);
+
+        Test.startTest();
+        Pokemon__c stoneEvolver = pokemonGameHelper.BuildPokemon(pokemonGameHelper.Species(25), 25, 20, false, trainer.Id);      // Pikachu — thunder stone
+        Pokemon__c friendshipEvolver = pokemonGameHelper.BuildPokemon(pokemonGameHelper.Species(42), 42, 30, false, trainer.Id); // Golbat — friendship
+        Pokemon__c levelEvolver = pokemonGameHelper.BuildPokemon(pokemonGameHelper.Species(1), 1, 10, false, trainer.Id);        // Bulbasaur — level-up
+        Pokemon__c nonEvolver = pokemonGameHelper.BuildPokemon(pokemonGameHelper.Species(132), 132, 10, false, trainer.Id);      // Ditto — never evolves
+        Test.stopTest();
+
+        System.assertEquals(true, stoneEvolver.Can_Evolve__c, 'A stone evolver (Pikachu) should be flagged Can Evolve');
+        System.assertEquals(true, friendshipEvolver.Can_Evolve__c, 'A friendship evolver (Golbat) should be flagged Can Evolve');
+        System.assertEquals(true, levelEvolver.Can_Evolve__c, 'A level-up evolver (Bulbasaur) should be flagged Can Evolve');
+        System.assertEquals(false, nonEvolver.Can_Evolve__c, 'A non-evolving species (Ditto) should not be flagged');
+    }
+
+    @isTest static void testIsMineScopedToOwner(){
+        Id otherTrainerId = CreateTrainerForOtherUser('Gary');
+        Pokemon_Trainer__c myTrainer = CreateTrainerAsCurrentUser('Ash', 25);
+
+        Test.startTest();
+        Pokemon__c minePoke = [SELECT Is_Mine__c FROM Pokemon__c WHERE Pokemon_Trainer__c = :myTrainer.Id LIMIT 1];
+        Pokemon__c otherPoke = [SELECT Is_Mine__c FROM Pokemon__c WHERE Pokemon_Trainer__c = :otherTrainerId LIMIT 1];
+        Test.stopTest();
+
+        System.assertEquals(true, minePoke.Is_Mine__c, 'My Pokemon should be flagged Is Mine for me — the My Pokemon list view relies on this');
+        System.assertEquals(false, otherPoke.Is_Mine__c, 'Another user\'s Pokemon must NOT be flagged Is Mine for me');
     }
 
     @isTest static void testReleaseLastPokemonBlocked(){

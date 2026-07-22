@@ -5,19 +5,27 @@
  * Modified: Garrett Kent - 06/21/2026 - Added client-side roster search/filter/sort/pagination over the loaded party.
  * Modified: Garrett Kent - 06/21/2026 - Derived availableStones from the trainer and passed it down to each pokemonCard for stone evolution.
  * Modified: Garrett Kent - 06/22/2026 - Roster markup: equal-height CSS-grid tiles, regrouped pagination footer, page-size combobox auto alignment.
+ * Modified: Garrett Kent - 07/21/2026 - Trainer name links to the trainer record (new tab); rival is editable inline via a combobox.
  */
 import { LightningElement, api, track } from 'lwc';
-import { ShowError, CheckBlank, isSuccess } from 'c/pokemonBasics';
+import { NavigationMixin } from 'lightning/navigation';
+import { ShowError, ShowToast, CheckBlank, isSuccess } from 'c/pokemonBasics';
 import { ballIconUrl } from 'c/pokemonApiService';
 import GetMyTrainer from '@salesforce/apex/pokemonGameController.GetMyTrainer';
 import GetTrainer from '@salesforce/apex/pokemonGameController.GetTrainer';
+import GetOtherTrainers from '@salesforce/apex/pokemonGameController.GetOtherTrainers';
+import SetRival from '@salesforce/apex/pokemonGameController.SetRival';
 
-export default class TrainerDashboard extends LightningElement {
+export default class TrainerDashboard extends NavigationMixin(LightningElement) {
     @api recordId;
     @track clientObj = {
         trainer: null,
         party: [],
         rivalName: '',
+        trainerRecordUrl: '',
+        isEditingRival: false,
+        rivalOptions: [],
+        rivalTrainerId: '',
         showOnboarding: false,
         headerBadges: [],
         ballSummary: [],
@@ -26,7 +34,7 @@ export default class TrainerDashboard extends LightningElement {
         partyCount: 0,
         hasParty: false,
         hasRival: false,
-        rivalLabel: 'Rival: ',
+        rivalLabel: 'Rival: N/A',
         rosterHeading: 'Your Pokemon — 0',
         showFilters: false,
         pageItems: [],
@@ -69,7 +77,8 @@ export default class TrainerDashboard extends LightningElement {
             partyCount,
             hasParty: partyCount > 0,
             hasRival: !CheckBlank(rivalName),
-            rivalLabel: `Rival: ${rivalName}`,
+            rivalLabel: `Rival: ${CheckBlank(rivalName) ? 'N/A' : rivalName}`,
+            rivalTrainerId: trainer && trainer.Rival__c ? trainer.Rival__c : '',
             rosterHeading: `Your Pokemon — ${partyCount}`
         };
     };
@@ -257,9 +266,24 @@ export default class TrainerDashboard extends LightningElement {
                 };
                 this.recomputeRoster();
                 this.resolveRival();
+                this.resolveTrainerUrl();
                 this.loading = false;
             })
             .catch(this.handleCatch);
+    };
+
+    // Build the standard record-page URL for the trainer so the name can open it in a new tab (anchor + target=_blank).
+    resolveTrainerUrl = () => {
+        const trainerId = this.clientObj.trainer && this.clientObj.trainer.Id;
+        if(CheckBlank(trainerId)) return;
+        this[NavigationMixin.GenerateUrl]({
+            type: 'standard__recordPage',
+            attributes: { recordId: trainerId, objectApiName: 'Pokemon_Trainer__c', actionName: 'view' }
+        })
+            .then((url) => {
+                this.clientObj = { ...this.clientObj, trainerRecordUrl: url };
+            })
+            .catch(() => {});
     };
 
     resolveRival = () => {
@@ -283,6 +307,44 @@ export default class TrainerDashboard extends LightningElement {
                 }
             })
             .catch(() => {});
+    };
+
+    // Open the rival editor. The trainer list is loaded lazily on first edit so a hub visit that never
+    // touches the rival costs no extra Apex; 'N/A' leads the options so a rival can be cleared.
+    handleEditRival = () => {
+        if(this.clientObj.rivalOptions.length > 0){
+            this.clientObj = { ...this.clientObj, isEditingRival: true };
+            return;
+        }
+        GetOtherTrainers({ params: {} })
+            .then((result) => {
+                const options = isSuccess(result) && result.otherTrainers ? result.otherTrainers : [];
+                this.clientObj = {
+                    ...this.clientObj,
+                    rivalOptions: [{ label: 'N/A', value: '' }, ...options],
+                    isEditingRival: true
+                };
+            })
+            .catch(this.handleCatch);
+    };
+
+    handleCancelRival = () => {
+        this.clientObj = { ...this.clientObj, isEditingRival: false };
+    };
+
+    handleRivalChange = (event) => {
+        const selectedRivalId = event.detail.value || '';
+        SetRival({ params: { rivalTrainerId: selectedRivalId } })
+            .then((result) => {
+                if(!isSuccess(result)){
+                    ShowToast('Rival', result.message || 'Could not update your rival.', 'error');
+                    return;
+                }
+                this.clientObj = { ...this.clientObj, trainer: result.trainer, isEditingRival: false };
+                this.resolveRival();
+                ShowToast('Success', 'Rival updated.', 'success');
+            })
+            .catch(this.handleCatch);
     };
 
     handleSearchChange = (event) => {

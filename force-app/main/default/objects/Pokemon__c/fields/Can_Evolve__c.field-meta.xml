@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Can_Evolve__c</fullName>
     <defaultValue>false</defaultValue>
-    <description>True when this species can evolve on level-up (stamped at catch from the species seed). Stone/trade/friendship evolutions are handled later.</description>
+    <description>True when this species can evolve by level-up, evolution stone, or friendship (stamped at catch from the species seed). Trade-only evolutions are not flagged.</description>
     <label>Can Evolve</label>
     <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>

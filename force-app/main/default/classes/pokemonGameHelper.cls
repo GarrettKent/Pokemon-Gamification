@@ -9,6 +9,7 @@
  * Modified: Garrett Kent - 06/25/2026 - Fixed mart checkout: JSON round-trip the LWC cart (Map<Object,Object>) before casting to Map<String,Object>
  * Modified: Garrett Kent - 07/05/2026 - Encrypted encounter tokens (anti-inspect grass), minimum wild levels for evolved/legendary species, shiny rolled at patch time, catch-rate multiplier
  * Modified: Garrett Kent - 07/05/2026 - Single-use tokens: consumed (caught/fled) encounter hashes ledgered on the trainer so a captured shiny token cannot be replayed
+ * Modified: Garrett Kent - 07/21/2026 - Can_Evolve__c stamped true for stone and friendship evolvers, not just level-up
  */
 public with sharing class pokemonGameHelper {
 
@@ -60,7 +61,7 @@ public with sharing class pokemonGameHelper {
             EXP_Points__c = pokemonCatchLogic.ExpForLevel(String.valueOf(species.get('growthRate')), level),
             Is_Shiny__c = isShiny,
             Is_Traded__c = false,
-            Can_Evolve__c = species.containsKey('evolveLevel')
+            Can_Evolve__c = species.containsKey('evolveLevel') || species.containsKey('stoneEvolutions') || species.containsKey('evolvesByFriendship')
         );
     }
 
