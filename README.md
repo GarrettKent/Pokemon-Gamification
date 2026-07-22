@@ -9,14 +9,14 @@ An **unlocked, unprefixed** Salesforce package that gamifies LSC's managed packa
 | | |
 |---|---|
 | **Package** | `LSC - Poke` (Unlocked, no namespace) — Id `0HoHs000000L2DcKAK` |
-| **Version** | `0.1.0-2` — Id `04tHs000000iTAUIA2` (**Released** — promoted 07/06/2026, 96% coverage; `0.1.0-1` beta superseded) |
+| **Version** | `0.1.2-1` — Id `04tHs000000iTAtIAM` (**Released** — promoted 07/21/2026, 96% coverage; supersedes `0.1.1-1` and `0.1.0-2`) |
 | **Dev Hub** | `tempdevHub` — **never `garrettLscProd`** |
 | **Install key + links** | [`docs/INSTALL_PRIVATE.md`](docs/INSTALL_PRIVATE.md) — local-only, git-ignored |
 | **Where to see it in the hub** | Nowhere in the org UI — 2GP packages are `Package2` Tooling-API records, so the CLI is the only window (`sf package list -v tempdevHub`, or `sf data query -q "SELECT Id, Name FROM Package2" -t -o tempdevHub`); Setup → Package Manager lists only 1GP packages (empty on this hub) and the App Launcher has no Packages entry |
 
 ```bash
-# CLI install (sandbox or prod — 0.1.0-2 is Released; key in docs/INSTALL_PRIVATE.md)
-sf package install -p 04tHs000000iTAUIA2 -k '<install key>' -o <orgAlias> -w 15
+# CLI install (sandbox or prod — 0.1.2-1 is Released; key in docs/INSTALL_PRIVATE.md)
+sf package install -p 04tHs000000iTAtIAM -k '<install key>' -o <orgAlias> -w 15
 # Promote a FUTURE version before it can install to prod (human-gated; create it with -c —
 # only coverage-computed versions are promotable)
 sf package version promote -p "LSC - Poke@<version>" -v tempdevHub
@@ -25,7 +25,7 @@ sf package version list -p "LSC - Poke" -v tempdevHub
 ```
 
 ## Status
-**Phase 1 (the player-facing game) and Phase 2a (the reward engine) are complete, deployed, and packaged** — `force-app/` is the source of truth, and version `0.1.0-2` (Released) captures all of it. The remaining work is **Phase 2b: subscriber rollout** (install → admin-created rule rows → the 5 one-line trigger hooks in the LSC repo → pilot). The complete rollout guide — checklist, rule matrix, and live-verified trigger facts — is an internal doc kept local, out of version control.
+**Phase 1 (the player-facing game) and Phase 2a (the reward engine) are complete, deployed, and packaged** — `force-app/` is the source of truth, and version `0.1.2-1` (Released) captures all of it. The remaining work is **Phase 2b: subscriber rollout** (install → admin-created rule rows → the 5 one-line trigger hooks in the LSC repo → pilot). The complete rollout guide — checklist, rule matrix, and live-verified trigger facts — is an internal doc kept local, out of version control.
 
 Dev/test happens in the **`lscPokemonUnlocked`** scratch org (the CLI default `target-org`). It has **no LSC1 installed** — nothing in the package names an LSC object — and it **expires 2026-07-20**; the package version outlives it, so nothing is lost when it does.
 
