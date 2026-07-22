@@ -27,10 +27,52 @@
                         </span>
                         <div class="trainer-card__identity">
                             <p class="trainer-card__eyebrow">Trainer Card</p>
-                            <h1 class="trainer-card__name">{clientObj.trainer.Name}</h1>
-                            <template lwc:if={clientObj.hasRival}>
-                                <p class="trainer-card__rival">{clientObj.rivalLabel}</p>
-                            </template>
+                            <h1 class="trainer-card__name">
+                                <template lwc:if={clientObj.trainerRecordUrl}>
+                                    <a
+                                        href={clientObj.trainerRecordUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="trainer-card__name-link"
+                                        title="Open your Trainer record"
+                                    >{clientObj.trainer.Name}</a>
+                                </template>
+                                <template lwc:else>{clientObj.trainer.Name}</template>
+                            </h1>
+                            <div class="trainer-card__rival-row">
+                                <template lwc:if={clientObj.isEditingRival}>
+                                    <lightning-combobox
+                                        class="trainer-card__rival-combo"
+                                        variant="label-hidden"
+                                        label="Rival"
+                                        value={clientObj.rivalTrainerId}
+                                        options={clientObj.rivalOptions}
+                                        onchange={handleRivalChange}
+                                        placeholder="N/A"
+                                    ></lightning-combobox>
+                                    <lightning-button-icon
+                                        icon-name="utility:close"
+                                        variant="bare"
+                                        size="small"
+                                        alternative-text="Cancel rival edit"
+                                        title="Cancel"
+                                        onclick={handleCancelRival}
+                                        class="trainer-card__rival-action"
+                                    ></lightning-button-icon>
+                                </template>
+                                <template lwc:else>
+                                    <p class="trainer-card__rival">{clientObj.rivalLabel}</p>
+                                    <lightning-button-icon
+                                        icon-name="utility:edit"
+                                        variant="bare"
+                                        size="small"
+                                        alternative-text="Change rival"
+                                        title="Change rival"
+                                        onclick={handleEditRival}
+                                        class="trainer-card__rival-action"
+                                    ></lightning-button-icon>
+                                </template>
+                            </div>
                         </div>
                         <a
                             class="trainer-card__jazz"

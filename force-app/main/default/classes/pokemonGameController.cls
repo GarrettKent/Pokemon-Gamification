@@ -8,6 +8,7 @@
  * Modified: Garrett Kent - 07/04/2026 - Pokemon-like nickname cap (12 characters) on rename
  * Modified: Garrett Kent - 07/05/2026 - Encrypted encounter tokens: patches hide species/level/shiny from the browser, RevealEncounter opens them, CatchPokemon consumes them; minimum wild levels; shiny rolled at patch time; friendly catch-rate multiplier
  * Modified: Garrett Kent - 07/05/2026 - Single-use tokens: a caught or fled encounter is ledgered on the trainer so a captured token cannot be replayed to farm shinies; broke-free stays throwable
+ * Modified: Garrett Kent - 07/21/2026 - Added SetRival so a trainer can change (or clear) their rival from the Trainer Hub
  */
 public with sharing class pokemonGameController {
 
@@ -629,6 +630,27 @@ public with sharing class pokemonGameController {
         }
         catch(Exception error){
             Fail(results, 'GetOtherTrainers', error);
+        }
+        return results;
+    }
+
+    @AuraEnabled
+    public static Map<String,Object> SetRival(Map<String,Object> params){
+        Map<String,Object> results = new Map<String,Object>();
+        results.put('status', 'success');
+        try{
+            Pokemon_Trainer__c trainer = pokemonGameHelper.LockTrainerForCurrentUser();
+            if(trainer == null) return Reject(results, 'You do not have a trainer yet');
+
+            // ResolveRivalId validates the pick server-side (another user's trainer whose owner holds the perm set)
+            // and returns null for a blank value, which clears the rival — the N/A option.
+            trainer.Rival__c = pokemonGameHelper.ResolveRivalId(params);
+            UPDATE trainer;
+
+            results.put('trainer', pokemonGameHelper.RequeryTrainer(trainer.Id));
+        }
+        catch(Exception error){
+            Fail(results, 'SetRival', error);
         }
         return results;
     }

@@ -140,6 +140,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Pokemon__c.Is_Mine__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Pokemon__c.Is_Shiny__c</field>
         <readable>true</readable>
     </fieldPermissions>
